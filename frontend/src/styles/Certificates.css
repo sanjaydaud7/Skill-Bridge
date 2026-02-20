@@ -1,0 +1,426 @@
+/* Certificates Layout */
+
+.certificates-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 100px 20px 40px;
+    min-height: 100vh;
+}
+
+.certificates-header {
+    margin-bottom: 40px;
+}
+
+.certificates-header h1 {
+    font-size: 32px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 8px;
+}
+
+
+/* Certificates Section */
+
+.certificates-section {
+    margin-bottom: 48px;
+}
+
+.certificates-section h2 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 24px;
+}
+
+.certificates-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 24px;
+}
+
+
+/* Certificate Card */
+
+.certificate-card {
+    background: white;
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    text-align: center;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.certificate-card:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    transform: translateY(-4px);
+}
+
+.certificate-card.earned {
+    border-color: #28a745;
+    background: linear-gradient(135deg, #f0fff4 0%, #ffffff 100%);
+}
+
+.certificate-card.available {
+    border-color: #667eea;
+    background: linear-gradient(135deg, #f0f4ff 0%, #ffffff 100%);
+}
+
+.certificate-card.in-progress {
+    border-color: #ffc107;
+    background: linear-gradient(135deg, #fffbf0 0%, #ffffff 100%);
+}
+
+.certificate-icon {
+    font-size: 64px;
+    margin-bottom: 16px;
+}
+
+.certificate-card h3 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 16px;
+    line-height: 1.3;
+}
+
+
+/* Completion Badge */
+
+.completion-badge {
+    display: inline-block;
+    background: #28a745;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+
+
+/* Certificate Details */
+
+.certificate-details {
+    margin: 20px 0;
+    text-align: left;
+}
+
+.certificate-details p {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 8px;
+    line-height: 1.5;
+}
+
+.certificate-number,
+.issue-date,
+.verification {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 8px 0;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.certificate-number strong,
+.verification code {
+    font-size: 14px;
+    color: #1a1a1a;
+    font-weight: 600;
+}
+
+.verification code {
+    background: #f0f0f0;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+}
+
+
+/* Price */
+
+.price {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin: 16px 0;
+}
+
+.price-label {
+    font-size: 14px;
+    color: #666;
+    font-weight: 500;
+}
+
+.price-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: #667eea;
+}
+
+
+/* Progress Info */
+
+.progress-info {
+    margin: 20px 0;
+}
+
+.progress-info p {
+    margin-top: 8px;
+    font-size: 14px;
+    color: #666;
+    text-align: center;
+}
+
+.progress-message {
+    color: #999;
+    font-size: 14px;
+    margin: 12px 0;
+}
+
+
+/* Certificate Actions */
+
+.certificate-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.certificate-actions .btn {
+    flex: 1;
+}
+
+
+/* Payment Modal */
+
+.payment-modal {
+    max-width: 600px;
+}
+
+.payment-modal-body {
+    padding: 24px;
+}
+
+.course-summary {
+    background: #f0f4ff;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 24px;
+    border-left: 4px solid #667eea;
+}
+
+.course-summary h3 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 16px;
+}
+
+.completion-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.completion-stats .stat {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #666;
+}
+
+.stat-icon {
+    font-size: 16px;
+}
+
+
+/* Payment Amount */
+
+.payment-amount {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 12px;
+    margin-bottom: 24px;
+}
+
+.amount-label {
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.amount-value {
+    font-size: 32px;
+    font-weight: 700;
+}
+
+
+/* Payment Methods */
+
+.payment-methods h4 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 16px;
+}
+
+.payment-option {
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+    transition: all 0.3s ease;
+}
+
+.payment-option:hover {
+    border-color: #667eea;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+}
+
+
+/* Bypass Option */
+
+.bypass-option {
+    background: linear-gradient(135deg, #fff9e6 0%, #ffffff 100%);
+    border-color: #ffc107;
+}
+
+.bypass-option:hover {
+    border-color: #ff9800;
+}
+
+
+/* Stripe Option */
+
+.stripe-option {
+    background: linear-gradient(135deg, #f0f4ff 0%, #ffffff 100%);
+    border-color: #667eea;
+}
+
+.option-header {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    margin-bottom: 16px;
+}
+
+.option-icon {
+    font-size: 32px;
+}
+
+.option-info h5 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 4px;
+}
+
+.option-info p {
+    font-size: 13px;
+    color: #666;
+}
+
+
+/* Payment Divider */
+
+.payment-divider {
+    position: relative;
+    text-align: center;
+    margin: 24px 0;
+}
+
+.payment-divider::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 1px;
+    background: #e0e0e0;
+}
+
+.payment-divider span {
+    position: relative;
+    background: white;
+    padding: 0 16px;
+    color: #999;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+
+/* Payment Note */
+
+.payment-note {
+    margin-top: 24px;
+    padding: 16px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.payment-note p {
+    font-size: 13px;
+    color: #666;
+    margin: 4px 0;
+}
+
+
+/* Button Variants */
+
+.btn-warning {
+    background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+    color: #333;
+    font-weight: 600;
+}
+
+.btn-warning:hover {
+    background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(255, 152, 0, 0.3);
+}
+
+
+/* Responsive Design */
+
+@media (max-width: 768px) {
+    .certificates-container {
+        padding: 80px 16px 20px;
+    }
+    .certificates-grid {
+        grid-template-columns: 1fr;
+    }
+    .certificates-header h1 {
+        font-size: 24px;
+    }
+    .certificate-card {
+        padding: 24px;
+    }
+    .certificate-actions {
+        flex-direction: column;
+    }
+    .payment-modal-body {
+        padding: 16px;
+    }
+    .payment-amount {
+        flex-direction: column;
+        gap: 8px;
+        text-align: center;
+    }
+    .amount-value {
+        font-size: 28px;
+    }
+    .option-header {
+        flex-direction: column;
+        text-align: center;
+    }
+}

@@ -1,0 +1,52 @@
+{
+    "name": "skillbridge-frontend",
+    "version": "1.0.0",
+    "description": "SkillBridge Internships - Frontend Application",
+    "private": true,
+    "dependencies": {
+        "@emotion/react": "^11.14.0",
+        "@emotion/styled": "^11.14.1",
+        "@mui/icons-material": "^5.18.0",
+        "@mui/material": "^5.18.0",
+        "@mui/x-data-grid": "^7.29.12",
+        "@stripe/react-stripe-js": "^5.6.0",
+        "@stripe/stripe-js": "^8.7.0",
+        "axios": "^1.13.4",
+        "date-fns": "^2.30.0",
+        "jspdf": "^4.1.0",
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0",
+        "react-dropzone": "^14.4.0",
+        "react-player": "^3.4.0",
+        "react-query": "^3.39.3",
+        "react-quill": "^2.0.0",
+        "react-router-dom": "^7.13.0",
+        "react-scripts": "5.0.1",
+        "react-toastify": "^11.0.5",
+        "recharts": "^2.15.4"
+    },
+    "scripts": {
+        "start": "react-scripts start",
+        "build": "react-scripts build",
+        "test": "react-scripts test",
+        "eject": "react-scripts eject"
+    },
+    "eslintConfig": {
+        "extends": [
+            "react-app",
+            "react-app/jest"
+        ]
+    },
+    "browserslist": {
+        "production": [
+            ">0.2%",
+            "not dead",
+            "not op_mini all"
+        ],
+        "development": [
+            "last 1 chrome version",
+            "last 1 firefox version",
+            "last 1 safari version"
+        ]
+    }
+}

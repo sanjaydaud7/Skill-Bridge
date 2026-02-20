@@ -1,0 +1,352 @@
+/* ============================================
+   HOW IT WORKS SECTION
+   Clean horizontal stepper design
+   ============================================ */
+
+.how-it-works-section {
+    padding: 8rem 0;
+    background: #ffffff;
+    position: relative;
+}
+
+.how-it-works-section .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+
+/* ============================================
+   SECTION HEADER
+   ============================================ */
+
+.how-it-works-section .section-header {
+    text-align: center;
+    margin-bottom: 5rem;
+}
+
+.how-it-works-section .section-title {
+    font-size: 3rem;
+    font-weight: 800;
+    color: #1e293b;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.how-it-works-section .section-subtitle {
+    font-size: 1.1rem;
+    color: #64748b;
+    font-weight: 400;
+}
+
+
+/* ============================================
+   STEPPER CONTAINER
+   ============================================ */
+
+.stepper-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 900px;
+    margin: 0 auto;
+    position: relative;
+}
+
+
+/* ============================================
+   STEP ELEMENTS
+   ============================================ */
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    flex: 1;
+    max-width: 200px;
+    position: relative;
+    z-index: 2;
+}
+
+.step-icon {
+    width: 80px;
+    height: 80px;
+    background: #ffffff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    position: relative;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    border: 3px solid #f1f5f9;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.step-icon .icon {
+    font-size: 2rem;
+    z-index: 2;
+}
+
+.step-number {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 24px;
+    height: 24px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 700;
+    border: 2px solid #ffffff;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.step-content {
+    max-width: 160px;
+}
+
+.step-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 0.5rem;
+    line-height: 1.3;
+}
+
+.step-description {
+    font-size: 0.9rem;
+    color: #64748b;
+    line-height: 1.4;
+    margin: 0;
+}
+
+
+/* ============================================
+   STEP CONNECTORS (LINES)
+   ============================================ */
+
+.step-connector {
+    flex: 1;
+    height: 2px;
+    background: linear-gradient(90deg, #e2e8f0 0%, #cbd5e1 50%, #e2e8f0 100%);
+    margin: 0 1rem;
+    position: relative;
+    max-width: 120px;
+}
+
+.step-connector::after {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: 0;
+    width: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    border-radius: 2px;
+    animation: progressLine 3s ease-in-out infinite;
+}
+
+@keyframes progressLine {
+    0%,
+    20% {
+        width: 0%;
+    }
+    80%,
+    100% {
+        width: 100%;
+    }
+}
+
+.step-connector:nth-of-type(2)::after {
+    animation-delay: 1s;
+}
+
+.step-connector:nth-of-type(4)::after {
+    animation-delay: 2s;
+}
+
+.step-connector:nth-of-type(6)::after {
+    animation-delay: 3s;
+}
+
+
+/* ============================================
+   HOVER EFFECTS
+   ============================================ */
+
+.step:hover .step-icon {
+    transform: translateY(-8px) scale(1.1);
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.12);
+    border-color: rgba(102, 126, 234, 0.2);
+}
+
+.step:hover .step-title {
+    color: #667eea;
+}
+
+
+/* ============================================
+   STEP SPECIFIC STYLING
+   ============================================ */
+
+.step:nth-child(1) .step-icon:hover {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+}
+
+.step:nth-child(3) .step-icon:hover {
+    background: linear-gradient(135deg, rgba(118, 75, 162, 0.05) 0%, rgba(79, 172, 254, 0.05) 100%);
+}
+
+.step:nth-child(5) .step-icon:hover {
+    background: linear-gradient(135deg, rgba(79, 172, 254, 0.05) 0%, rgba(34, 197, 94, 0.05) 100%);
+}
+
+.step:nth-child(7) .step-icon:hover {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.05) 0%, rgba(249, 115, 22, 0.05) 100%);
+}
+
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+@media (max-width: 1024px) {
+    .stepper-container {
+        max-width: 800px;
+    }
+    .step-connector {
+        max-width: 80px;
+        margin: 0 0.5rem;
+    }
+    .step-icon {
+        width: 70px;
+        height: 70px;
+    }
+    .step-icon .icon {
+        font-size: 1.8rem;
+    }
+    .step-number {
+        width: 20px;
+        height: 20px;
+        font-size: 0.7rem;
+        top: -6px;
+        right: -6px;
+    }
+}
+
+@media (max-width: 768px) {
+    .how-it-works-section {
+        padding: 6rem 0;
+    }
+    .how-it-works-section .section-title {
+        font-size: 2.5rem;
+    }
+    .stepper-container {
+        flex-direction: column;
+        max-width: 400px;
+    }
+    .step {
+        max-width: 100%;
+        margin-bottom: 2rem;
+    }
+    .step:last-child {
+        margin-bottom: 0;
+    }
+    .step-connector {
+        width: 2px;
+        height: 40px;
+        max-width: none;
+        margin: 0;
+        background: linear-gradient(180deg, #e2e8f0 0%, #cbd5e1 50%, #e2e8f0 100%);
+    }
+    .step-connector::after {
+        width: 4px;
+        height: 0;
+        animation: progressLineVertical 3s ease-in-out infinite;
+    }
+    @keyframes progressLineVertical {
+        0%,
+        20% {
+            height: 0%;
+        }
+        80%,
+        100% {
+            height: 100%;
+        }
+    }
+    .step-content {
+        max-width: 250px;
+    }
+    .step-title {
+        font-size: 1.2rem;
+    }
+    .step-description {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .how-it-works-section {
+        padding: 5rem 0;
+    }
+    .how-it-works-section .container {
+        padding: 0 1rem;
+    }
+    .how-it-works-section .section-title {
+        font-size: 2rem;
+    }
+    .step-icon {
+        width: 60px;
+        height: 60px;
+    }
+    .step-icon .icon {
+        font-size: 1.5rem;
+    }
+    .step-number {
+        width: 18px;
+        height: 18px;
+        font-size: 0.6rem;
+        top: -5px;
+        right: -5px;
+    }
+    .step-title {
+        font-size: 1.1rem;
+    }
+    .step-description {
+        font-size: 0.9rem;
+    }
+}
+
+
+/* ============================================
+   ACCESSIBILITY
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+    .step-connector::after,
+    .step-icon,
+    .step {
+        animation: none;
+        transition: none;
+    }
+    .step:hover .step-icon {
+        transform: none;
+    }
+}
+
+
+/* Focus states for keyboard navigation */
+
+.step:focus-within .step-icon {
+    outline: 2px solid rgba(102, 126, 234, 0.5);
+    outline-offset: 4px;
+}

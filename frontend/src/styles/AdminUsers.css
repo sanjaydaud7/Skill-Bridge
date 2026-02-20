@@ -1,0 +1,180 @@
+.admin-users {
+    animation: fadeIn 0.3s ease;
+}
+
+.users-header {
+    margin-bottom: 2rem;
+}
+
+.users-header h1 {
+    margin: 0;
+    font-size: 2rem;
+    color: #1e293b;
+}
+
+.users-header p {
+    margin: 0.25rem 0 0;
+    color: #64748b;
+}
+
+.users-filters {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.users-table {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.users-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.users-table thead {
+    background: #f8fafc;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.users-table th {
+    padding: 1rem 1.5rem;
+    text-align: left;
+    font-weight: 600;
+    color: #475569;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.users-table td {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.users-table tbody tr:hover {
+    background: #f8fafc;
+}
+
+.role-select {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.role-select.role-student {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.role-select.role-admin {
+    background: #fce7f3;
+    color: #be123c;
+}
+
+.role-select:focus {
+    outline: none;
+    border-color: #3b82f6;
+}
+
+.user-details-grid {
+    display: grid;
+    gap: 2rem;
+}
+
+.detail-section {
+    background: #f8fafc;
+    padding: 1.5rem;
+    border-radius: 12px;
+}
+
+.detail-section h3 {
+    margin: 0 0 1rem;
+    font-size: 1.125rem;
+    color: #1e293b;
+}
+
+.detail-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.detail-item:last-child {
+    border-bottom: none;
+}
+
+.detail-item span:first-child {
+    color: #64748b;
+}
+
+.role-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.role-badge.role-student {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.role-badge.role-admin {
+    background: #fce7f3;
+    color: #be123c;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.stat-box {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #3b82f6;
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: #64748b;
+}
+
+.modal-content.large {
+    max-width: 900px;
+}
+
+@media (max-width: 768px) {
+    .users-table {
+        overflow-x: auto;
+    }
+    .users-table table {
+        min-width: 800px;
+    }
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+}

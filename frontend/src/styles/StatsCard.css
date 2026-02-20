@@ -1,0 +1,112 @@
+.stats-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stats-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.stats-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.stats-card-title {
+    font-size: 0.875rem;
+    color: #64748b;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.stats-card-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.stats-card-blue .stats-card-icon {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+}
+
+.stats-card-green .stats-card-icon {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+}
+
+.stats-card-orange .stats-card-icon {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: white;
+}
+
+.stats-card-purple .stats-card-icon {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    color: white;
+}
+
+.stats-card-icon .material-icons {
+    font-size: 1.5rem;
+}
+
+.stats-card-body {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.stats-card-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.stats-card-trend {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+}
+
+.stats-card-trend.up {
+    color: #059669;
+    background: #d1fae5;
+}
+
+.stats-card-trend.down {
+    color: #dc2626;
+    background: #fee2e2;
+}
+
+.stats-card-trend .material-icons {
+    font-size: 1rem;
+}
+
+@media (max-width: 768px) {
+    .stats-card {
+        padding: 1rem;
+    }
+    .stats-card-value {
+        font-size: 1.5rem;
+    }
+    .stats-card-icon {
+        width: 40px;
+        height: 40px;
+    }
+    .stats-card-icon .material-icons {
+        font-size: 1.25rem;
+    }
+}

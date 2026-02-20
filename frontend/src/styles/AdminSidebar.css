@@ -1,0 +1,109 @@
+.admin-sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 260px;
+    height: 100vh;
+    background: linear-gradient(180deg, #1e3a8a 0%, #1e40af 100%);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    z-index: 100;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.admin-sidebar-header {
+    padding: 2rem 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.admin-sidebar-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.admin-sidebar-nav {
+    flex: 1;
+    padding: 1rem 0;
+    overflow-y: auto;
+}
+
+.admin-sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.875rem 1.5rem;
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
+}
+
+.admin-sidebar-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border-left-color: rgba(255, 255, 255, 0.3);
+}
+
+.admin-sidebar-item.active {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    border-left-color: white;
+    font-weight: 500;
+}
+
+.admin-sidebar-item .material-icons {
+    font-size: 1.25rem;
+}
+
+.admin-sidebar-footer {
+    padding: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.back-to-site {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.back-to-site:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.back-to-site .material-icons {
+    font-size: 1.125rem;
+}
+
+@media (max-width: 768px) {
+    .admin-sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+    }
+    .admin-sidebar-nav {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.5rem;
+        padding: 1rem;
+    }
+    .admin-sidebar-item {
+        flex-direction: column;
+        text-align: center;
+        padding: 1rem;
+        border-left: none;
+        border-radius: 8px;
+    }
+    .admin-sidebar-item.active {
+        background: rgba(255, 255, 255, 0.2);
+        border-left: none;
+    }
+}
