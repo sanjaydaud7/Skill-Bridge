@@ -3,7 +3,8 @@ const router = express.Router();
 const {
     getCourseProgress,
     markVideoCompleted,
-    getUserStats
+    getUserStats,
+    bypassCompleteAll
 } = require('../controllers/progressController');
 const { protect } = require('../middleware/auth');
 
@@ -11,7 +12,8 @@ const { protect } = require('../middleware/auth');
 router.use(protect);
 
 router.get('/stats', getUserStats);
-router.get('/:courseId', getCourseProgress);
+router.post('/:courseId/bypass-complete', bypassCompleteAll);
 router.post('/:courseId/video/:moduleId', markVideoCompleted);
+router.get('/:courseId', getCourseProgress);
 
 module.exports = router;

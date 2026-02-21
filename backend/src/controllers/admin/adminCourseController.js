@@ -789,7 +789,7 @@ exports.getCourseStats = async(req, res) => {
         ).length;
 
         const avgProgress = enrollments.length > 0 ?
-            enrollments.reduce((sum, e) => sum + (e.progress ? .completionPercentage || 0), 0) / enrollments.length :
+            enrollments.reduce((sum, e) => sum + ((e.progress && e.progress.completionPercentage) || 0), 0) / enrollments.length :
             0;
 
         res.json({

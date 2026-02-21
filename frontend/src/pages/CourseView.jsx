@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
-import ReactPlayer from 'react-player';
 import axios from 'axios';
 import '../styles/CourseView.css';
+import { saveAs } from 'file-saver';
 
 const API_URL = 'http://localhost:5000/api';
 
@@ -18,8 +18,82 @@ const CourseView = () => {
   const [tasks, setTasks] = useState([]);
   const [progress, setProgress] = useState(null);
   const [currentModule, setCurrentModule] = useState(null);
+  const [currentVideo, setCurrentVideo] = useState(null); // For videos array support
   const [loading, setLoading] = useState(true);
   const [videoEnded, setVideoEnded] = useState(false);
+  const [expandedModules, setExpandedModules] = useState({});
+  const videoRef = useRef(null);
+  const [certificate, setCertificate] = useState(null);
+  const [loadingCertificate, setLoadingCertificate] = useState(false);
+
+  // Fetch certificate if eligible
+  useEffect(() => {
+    const fetchCertificate = async () => {
+      if (
+        progress?.stats?.completionPercentage === 100 &&
+        progress?.stats?.completedTasks === progress?.stats?.totalTasks &&
+        progress?.stats?.projectApproved
+      ) {
+        setLoadingCertificate(true);
+        try {
+          const res = await axios.get(`${API_URL}/certificate?courseId=${courseId}`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          if (res.data && res.data.certificates && res.data.certificates.length > 0) {
+            setCertificate(res.data.certificates[0]);
+          } else {
+            setCertificate(null);
+          }
+        } catch (err) {
+          setCertificate(null);
+        }
+        setLoadingCertificate(false);
+      }
+    };
+    fetchCertificate();
+  }, [progress, courseId, token]);
+
+  // Download certificate PDF
+  const handleDownloadCertificate = async () => {
+    if (!certificate) return;
+    try {
+      const res = await axios.get(`${API_URL}/certificate/${certificate._id}/download`, {
+        responseType: 'blob',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      saveAs(res.data, `Certificate-${certificate.certificateNumber || certificate._id}.pdf`);
+    } catch (err) {
+      alert('Failed to download certificate.');
+    }
+  };
+
+  // Certificate generation handler
+  const handleGenerateCertificate = async () => {
+    setLoadingCertificate(true);
+    try {
+      // Use 'BYPASS' for paymentId if payment is bypassed
+      const paymentId = progress?.enrollment?.paymentId || 'BYPASS';
+      const res = await axios.post(
+        `${API_URL}/certificates/${courseId}/generate`,
+        { paymentId },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (res.data && res.data.success) {
+        setCertificate(res.data.data);
+        alert('Certificate generated successfully!');
+      } else {
+        alert(res.data.message || 'Failed to generate certificate.');
+      }
+    } catch (error) {
+      alert(
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        'Failed to generate certificate.'
+      );
+      setCertificate(null);
+    }
+    setLoadingCertificate(false);
+  };
 
   useEffect(() => {
     if (!isAuthenticated()) {
@@ -46,9 +120,20 @@ const CourseView = () => {
       setTasks(tasksRes.data.data);
       setProgress(progressRes.data.data);
       
-      // Set first module as current if none selected
+      // Set first module/video as current if none selected
       if (curriculumRes.data.data.length > 0) {
-        setCurrentModule(curriculumRes.data.data[0]);
+        const firstModule = curriculumRes.data.data[0];
+        setCurrentModule(firstModule);
+        
+        // If module has videos array, set first video as current
+        if (firstModule.videos && firstModule.videos.length > 0) {
+          setCurrentVideo(firstModule.videos[0]);
+        } else {
+          setCurrentVideo(null);
+        }
+        
+        // Expand first module by default
+        setExpandedModules({ [firstModule._id]: true });
       }
     } catch (error) {
       console.error('Error fetching course data:', error);
@@ -90,6 +175,51 @@ const CourseView = () => {
     }
   };
 
+  // Bypass function to complete all videos, tasks, and project for testing
+  const handleBypassCompletion = async () => {
+    if (!window.confirm('⚠️ TESTING MODE: This will mark ALL videos, tasks, and project as complete. Continue?')) {
+      return;
+    }
+
+    try {
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+
+      console.log('Calling bypass-complete endpoint for courseId:', courseId);
+
+      // Call the bypass-complete endpoint
+      const response = await axios.post(
+        `${API_URL}/progress/${courseId}/bypass-complete`,
+        {},
+        config
+      );
+
+      console.log('Bypass response:', response.data);
+
+      // Refresh progress
+      const progressRes = await axios.get(`${API_URL}/progress/${courseId}`, config);
+      setProgress(progressRes.data.data);
+
+      // Refresh tasks
+      const tasksRes = await axios.get(`${API_URL}/tasks/${courseId}`, config);
+      setTasks(tasksRes.data.data);
+
+      const { videosCompleted, tasksCompleted, projectApproved } = response.data.data;
+
+      alert(
+        `✅ Bypass completed!\n\n` +
+        `📹 Videos: ${videosCompleted} completed\n` +
+        `📝 Tasks: ${tasksCompleted} completed\n` +
+        `🎯 Project: ${projectApproved ? 'Approved' : 'N/A'}\n\n` +
+        `🏆 Certificate is now available!`
+      );
+    } catch (error) {
+      console.error('Error in bypass completion:', error);
+      console.error('Error response:', error.response?.data);
+      const errorMsg = error.response?.data?.message || error.message || 'Unknown error';
+      alert(`❌ Error during bypass: ${errorMsg}\n\nCheck console for details.`);
+    }
+  };
+
   const isModuleCompleted = (moduleId) => {
     return progress?.enrollment?.progress?.videosCompleted?.some(
       v => v.moduleId === moduleId
@@ -103,7 +233,95 @@ const CourseView = () => {
   const selectModule = (module) => {
     setCurrentModule(module);
     setVideoEnded(false);
+    
+    // If module has videos array, set first video as current
+    if (module.videos && module.videos.length > 0) {
+      setCurrentVideo(module.videos[0]);
+    } else {
+      setCurrentVideo(null);
+    }
+    
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const selectVideo = (video) => {
+    setCurrentVideo(video);
+    setVideoEnded(false);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const toggleModule = (moduleId) => {
+    setExpandedModules(prev => ({
+      ...prev,
+      [moduleId]: !prev[moduleId]
+    }));
+  };
+
+  // Get the current video URL to play
+  const getCurrentVideoUrl = () => {
+    if (currentVideo) {
+      return currentVideo.videoUrl;
+    }
+    if (currentModule && currentModule.videoUrl) {
+      return currentModule.videoUrl;
+    }
+    return null;
+  };
+
+  // Get current video title
+  const getCurrentVideoTitle = () => {
+    if (currentVideo) {
+      return currentVideo.title;
+    }
+    if (currentModule) {
+      return currentModule.title;
+    }
+    return '';
+  };
+
+  // Get current video description
+  const getCurrentVideoDescription = () => {
+    if (currentVideo && currentVideo.description) {
+      return currentVideo.description;
+    }
+    if (currentModule && currentModule.description) {
+      return currentModule.description;
+    }
+    return '';
+  };
+
+  // Check if URL is YouTube
+  const isYouTubeUrl = (url) => {
+    if (!url) return false;
+    return url.includes('youtube.com') || url.includes('youtu.be');
+  };
+
+  // Convert YouTube URL to embed URL
+  const getYouTubeEmbedUrl = (url) => {
+    if (!url) return '';
+    
+    let videoId = '';
+    
+    // Handle youtube.com/watch?v=VIDEO_ID
+    if (url.includes('youtube.com/watch')) {
+      const urlParams = new URLSearchParams(url.split('?')[1]);
+      videoId = urlParams.get('v');
+    }
+    // Handle youtu.be/VIDEO_ID
+    else if (url.includes('youtu.be/')) {
+      videoId = url.split('youtu.be/')[1].split('?')[0];
+    }
+    // Handle youtube.com/embed/VIDEO_ID
+    else if (url.includes('youtube.com/embed/')) {
+      return url;
+    }
+    
+    return videoId ? `https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1` : url;
+  };
+
+  // Handle video end event
+  const handleVideoEnded = () => {
+    handleVideoEnd();
   };
 
   if (loading) {
@@ -158,31 +376,67 @@ const CourseView = () => {
                   style={{ width: `${progress?.stats?.completionPercentage || 0}%` }}
                 ></div>
               </div>
-              <p className="progress-text">
-                {progress?.stats?.completionPercentage || 0}% Complete
-              </p>
+              <div className="progress-info-row">
+                <p className="progress-text">
+                  {progress?.stats?.completionPercentage || 0}% Complete
+                </p>
+                <button 
+                  onClick={handleBypassCompletion}
+                  className="bypass-btn"
+                  title="Testing: Mark all videos, tasks, and project as complete"
+                >
+                  ⚡ Complete All (Test)
+                </button>
+              </div>
             </div>
           </div>
 
           {/* Video Player */}
-          {currentModule && (
+          {(currentModule || currentVideo) && getCurrentVideoUrl() && (
             <div className="video-section">
-              <h2>{currentModule.title}</h2>
-              <p className="module-description">{currentModule.description}</p>
+              <h2>{getCurrentVideoTitle()}</h2>
+              {getCurrentVideoDescription() && (
+                <p className="module-description">{getCurrentVideoDescription()}</p>
+              )}
               
               <div className="video-player-wrapper">
-                <ReactPlayer
-                  url={currentModule.videoUrl}
-                  controls
-                  width="100%"
-                  height="100%"
-                  onEnded={handleVideoEnd}
-                  config={{
-                    youtube: {
-                      playerVars: { showinfo: 1 }
-                    }
-                  }}
-                />
+                {isYouTubeUrl(getCurrentVideoUrl()) ? (
+                  <iframe
+                    src={getYouTubeEmbedUrl(getCurrentVideoUrl())}
+                    title={getCurrentVideoTitle()}
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      width: '100%',
+                      height: '100%'
+                    }}
+                  />
+                ) : (
+                  <video
+                    ref={videoRef}
+                    controls
+                    controlsList="nodownload"
+                    onEnded={handleVideoEnded}
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      width: '100%',
+                      height: '100%',
+                      backgroundColor: '#000'
+                    }}
+                    key={getCurrentVideoUrl()}
+                  >
+                    <source src={getCurrentVideoUrl()} type="video/mp4" />
+                    <source src={getCurrentVideoUrl()} type="video/webm" />
+                    <source src={getCurrentVideoUrl()} type="video/ogg" />
+                    Your browser does not support the video tag.
+                  </video>
+                )}
               </div>
 
               {videoEnded && !isModuleCompleted(currentModule._id) && (
@@ -250,18 +504,63 @@ const CourseView = () => {
             <h3>📖 Course Curriculum</h3>
             <div className="curriculum-list">
               {modules.map((module) => (
-                <div
-                  key={module._id}
-                  className={`curriculum-item ${currentModule?._id === module._id ? 'active' : ''} ${isModuleCompleted(module._id) ? 'completed' : ''}`}
-                  onClick={() => selectModule(module)}
-                >
-                  <div className="module-number">
-                    {isModuleCompleted(module._id) ? '✓' : module.moduleNumber}
+                <div key={module._id} className="curriculum-module-wrapper">
+                  {/* Module/Week Header */}
+                  <div
+                    className={`curriculum-item ${currentModule?._id === module._id ? 'active' : ''} ${isModuleCompleted(module._id) ? 'completed' : ''}`}
+                    onClick={() => {
+                      if (module.videos && module.videos.length > 0) {
+                        toggleModule(module._id);
+                      } else {
+                        selectModule(module);
+                      }
+                    }}
+                  >
+                    <div className="module-number">
+                      {isModuleCompleted(module._id) ? '✓' : module.moduleNumber}
+                    </div>
+                    <div className="module-info">
+                      <h4>{module.title}</h4>
+                      <p>
+                        {module.videos && module.videos.length > 0 
+                          ? `${module.videos.length} videos`
+                          : module.duration ? `${Math.floor(module.duration / 60)} min` : 'Video'
+                        }
+                      </p>
+                    </div>
+                    {module.videos && module.videos.length > 0 && (
+                      <span className="expand-icon">
+                        {expandedModules[module._id] ? '▼' : '▶'}
+                      </span>
+                    )}
                   </div>
-                  <div className="module-info">
-                    <h4>{module.title}</h4>
-                    <p>{Math.floor(module.duration / 60)} min</p>
-                  </div>
+
+                  {/* Day-wise Videos (if videos array exists) */}
+                  {module.videos && module.videos.length > 0 && expandedModules[module._id] && (
+                    <div className="videos-list">
+                      {module.videos.map((video, index) => (
+                        <div
+                          key={index}
+                          className={`video-item ${currentVideo && currentVideo.videoUrl === video.videoUrl ? 'active-video' : ''}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setCurrentModule(module);
+                            selectVideo(video);
+                          }}
+                        >
+                          <span className="video-play-icon">▶</span>
+                          <div className="video-item-info">
+                            <h5>{video.title}</h5>
+                            {video.duration && (
+                              <span className="video-duration">
+                                {Math.floor(video.duration / 60)} min
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -308,12 +607,41 @@ const CourseView = () => {
             {progress?.stats?.completionPercentage === 100 && 
              progress?.stats?.completedTasks === progress?.stats?.totalTasks &&
              progress?.stats?.projectApproved ? (
-              <button 
-                onClick={() => navigate(`/dashboard/certificates`)}
-                className="btn btn-primary btn-full"
-              >
-                Get Certificate
-              </button>
+                <div className="certificate-ready">
+                  <div className="ready-badge">
+                    ✅ You're Eligible!
+                  </div>
+                  <p className="ready-message">
+                    Congratulations! You've completed all requirements.
+                  </p>
+                  {loadingCertificate ? (
+                    <p>Loading certificate...</p>
+                  ) : certificate ? (
+                    <>
+                      <button
+                        onClick={handleDownloadCertificate}
+                        className="btn btn-primary btn-full"
+                      >
+                        📄 Download Certificate PDF
+                      </button>
+                      <p className="certificate-note">
+                        Certificate unlocked! You can download it as PDF.
+                      </p>
+                    </>
+                  ) : (
+                      <>
+                        <button
+                          onClick={() => navigate(`/dashboard/certificates?courseId=${courseId}`)}
+                          className="btn btn-success btn-full"
+                        >
+                          🎓 Get Certificate
+                        </button>
+                        <p className="certificate-note">
+                          (Use bypass payment option for testing)
+                        </p>
+                      </>
+                  )}
+                </div>
             ) : (
               <div className="certificate-locked">
                 <p>Complete all requirements to unlock certificate</p>

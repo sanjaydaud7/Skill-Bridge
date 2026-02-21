@@ -249,7 +249,7 @@ exports.getCourseAnalytics = async(req, res) => {
                 const completed = enrollments.filter(e => e.status === 'completed').length;
                 const active = enrollments.filter(e => ['enrolled', 'in-progress'].includes(e.status)).length;
                 const avgProgress = enrollments.length > 0 ?
-                    enrollments.reduce((sum, e) => sum + (e.progress ? .completionPercentage || 0), 0) / enrollments.length :
+                    enrollments.reduce((sum, e) => sum + ((e.progress && e.progress.completionPercentage) || 0), 0) / enrollments.length :
                     0;
 
                 const certificates = await Certificate.countDocuments({ courseId: course._id });
@@ -268,7 +268,7 @@ exports.getCourseAnalytics = async(req, res) => {
                     completionRate: enrollments.length > 0 ? Math.round((completed / enrollments.length) * 100) : 0,
                     avgProgress: Math.round(avgProgress),
                     certificates,
-                    revenue: revenue[0] ? .total || 0
+                    revenue: (revenue[0] && revenue[0].total) || 0
                 };
             })
         );
@@ -310,7 +310,7 @@ exports.getStudentAnalytics = async(req, res) => {
         };
 
         enrollments.forEach(enrollment => {
-            const completion = enrollment.progress ? .completionPercentage || 0;
+            const completion = (enrollment.progress && enrollment.progress.completionPercentage) || 0;
             if (completion === 100) completionDistribution['100%']++;
             else if (completion >= 76) completionDistribution['76-99%']++;
             else if (completion >= 51) completionDistribution['51-75%']++;

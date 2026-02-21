@@ -352,7 +352,7 @@ exports.getEnrollmentStats = async(req, res) => {
         // Get average completion percentage
         const enrollments = await Enrollment.find(query);
         const avgCompletion = enrollments.length > 0 ?
-            enrollments.reduce((sum, e) => sum + (e.progress ? .completionPercentage || 0), 0) / enrollments.length :
+            enrollments.reduce((sum, e) => sum + ((e.progress && e.progress.completionPercentage) || 0), 0) / enrollments.length :
             0;
 
         res.json({

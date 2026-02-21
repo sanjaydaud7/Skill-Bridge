@@ -134,9 +134,9 @@ exports.manualIssueCertificate = async(req, res) => {
 
         // Check eligibility (unless override)
         if (!override) {
-            const completionPercentage = enrollment.progress ? .completionPercentage || 0;
-            const tasksCompleted = enrollment.progress ? .tasksCompleted ? .length || 0;
-            const projectApproved = enrollment.progress ? .projectApproved || false;
+            const completionPercentage = (enrollment.progress && enrollment.progress.completionPercentage) || 0;
+            const tasksCompleted = (enrollment.progress && enrollment.progress.tasksCompleted && enrollment.progress.tasksCompleted.length) || 0;
+            const projectApproved = (enrollment.progress && enrollment.progress.projectApproved) || false;
 
             if (completionPercentage < 100 || tasksCompleted < course.totalTasks || !projectApproved) {
                 return res.status(400).json({

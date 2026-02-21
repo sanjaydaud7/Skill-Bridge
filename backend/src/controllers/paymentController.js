@@ -1,7 +1,57 @@
 const Payment = require('../models/Payment');
 const Course = require('../models/Course');
 const Enrollment = require('../models/Enrollment');
+const Certificate = require('../models/Certificate');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+
+// Helper function to auto-generate certificate after payment
+const autoGenerateCertificate = async (userId, courseId, paymentId, enrollmentId) => {
+    try {
+        console.log('🎓 Auto-generating certificate for:', { userId, courseId, paymentId, enrollmentId });
+        
+        // Check if certificate already exists
+        const existingCertificate = await Certificate.findOne({ userId, courseId });
+        if (existingCertificate) {
+            console.log('✅ Certificate already exists:', existingCertificate._id);
+            return existingCertificate;
+        }
+
+        // Get course for details
+        const course = await Course.findById(courseId);
+        
+        // Create certificate
+        const certificate = await Certificate.create({
+            userId,
+            courseId,
+            enrollmentId,
+            paymentId,
+            grade: 'A',
+            skills: course?.skills || []
+        });
+
+        console.log('🎉 Certificate created:', certificate._id, certificate.certificateNumber);
+
+        // Update enrollment
+        await Enrollment.findByIdAndUpdate(enrollmentId, {
+            status: 'certificate-purchased',
+            certificateId: certificate._id,
+            completedAt: new Date()
+        });
+
+        console.log('✅ Enrollment updated');
+
+        // Set placeholder PDF URL
+        certificate.pdfUrl = `https://certificates.skillbridge.com/${certificate.certificateNumber}.pdf`;
+        await certificate.save();
+
+        console.log('🎓 Certificate auto-generated successfully:', certificate._id);
+        return certificate;
+    } catch (error) {
+        console.error('❌ Auto-generate certificate error:', error);
+        console.error('Error details:', error.message);
+        return null;
+    }
+};
 
 // @desc    Create Stripe checkout session
 // @route   POST /api/payments/create-checkout
@@ -37,10 +87,39 @@ exports.createCheckoutSession = async(req, res) => {
         });
 
         if (existingPayment) {
-            return res.status(400).json({
-                success: false,
-                message: 'Payment already completed for this course'
-            });
+            // Check if certificate already exists
+            const existingCertificate = await Certificate.findOne({ userId, courseId });
+            
+            if (existingCertificate) {
+                // Payment and certificate both exist
+                return res.status(400).json({
+                    success: false,
+                    message: 'Certificate already issued for this course',
+                    certificateExists: true
+                });
+            } else {
+                // Payment exists but no certificate - auto-generate it
+                console.log('Payment exists but no certificate, auto-generating...');
+                const certificate = await autoGenerateCertificate(
+                    userId,
+                    courseId,
+                    existingPayment._id,
+                    enrollment._id
+                );
+                
+                if (certificate) {
+                    return res.status(200).json({
+                        success: true,
+                        message: 'Certificate generated successfully from existing payment',
+                        data: { certificate }
+                    });
+                } else {
+                    return res.status(500).json({
+                        success: false,
+                        message: 'Failed to generate certificate'
+                    });
+                }
+            }
         }
 
         // Create payment record
@@ -67,8 +146,8 @@ exports.createCheckoutSession = async(req, res) => {
                 quantity: 1,
             }, ],
             mode: 'payment',
-            success_url: `${process.env.FRONTEND_URL}/dashboard/certificates?success=true&session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${process.env.FRONTEND_URL}/dashboard/certificates?canceled=true`,
+            success_url: `${process.env.FRONTEND_URL}/dashboard/certificates?success=true&courseId=${courseId}&session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `${process.env.FRONTEND_URL}/dashboard/certificates?canceled=true&courseId=${courseId}`,
             metadata: {
                 userId: userId,
                 courseId: courseId,
@@ -119,13 +198,48 @@ exports.handleWebhook = async(req, res) => {
     switch (event.type) {
         case 'checkout.session.completed':
             const session = event.data.object;
+            console.log('💳 Stripe checkout completed:', session.id);
 
             // Update payment status
-            await Payment.findOneAndUpdate({ stripeSessionId: session.id }, {
-                status: 'completed',
-                stripePaymentIntentId: session.payment_intent,
-                paidAt: new Date()
-            });
+            const payment = await Payment.findOneAndUpdate(
+                { stripeSessionId: session.id },
+                {
+                    status: 'completed',
+                    stripePaymentIntentId: session.payment_intent,
+                    paidAt: new Date()
+                },
+                { new: true }
+            );
+
+            if (!payment) {
+                console.error('❌ Payment not found for session:', session.id);
+            } else {
+                console.log('✅ Payment updated:', payment._id);
+
+                // Auto-generate certificate
+                const enrollment = await Enrollment.findOne({
+                    userId: payment.userId,
+                    courseId: payment.courseId
+                });
+                
+                if (enrollment) {
+                    console.log('🎓 Generating certificate for completed payment');
+                    const certificate = await autoGenerateCertificate(
+                        payment.userId,
+                        payment.courseId,
+                        payment._id,
+                        enrollment._id
+                    );
+                    
+                    if (certificate) {
+                        console.log('🎉 Certificate unlocked:', certificate._id);
+                    } else {
+                        console.error('❌ Failed to generate certificate');
+                    }
+                } else {
+                    console.error('❌ Enrollment not found for payment:', payment._id);
+                }
+            }
 
             break;
 
@@ -177,6 +291,18 @@ exports.bypassPayment = async(req, res) => {
             });
         }
 
+        // Check if certificate already exists
+        const Certificate = require('../models/Certificate');
+        const existingCertificate = await Certificate.findOne({ userId, courseId });
+        
+        if (existingCertificate) {
+            return res.status(400).json({
+                success: false,
+                message: 'Certificate already issued for this course',
+                alreadyIssued: true
+            });
+        }
+
         // Check if payment already exists
         const existingPayment = await Payment.findOne({
             userId,
@@ -185,10 +311,30 @@ exports.bypassPayment = async(req, res) => {
         });
 
         if (existingPayment) {
-            return res.status(400).json({
-                success: false,
-                message: 'Payment already completed for this course'
-            });
+            // Payment exists but no certificate - auto-generate it
+            console.log('Payment exists but no certificate, auto-generating...');
+            const certificate = await autoGenerateCertificate(
+                userId,
+                courseId,
+                existingPayment._id,
+                enrollment._id
+            );
+            
+            if (certificate) {
+                return res.status(200).json({
+                    success: true,
+                    message: 'Certificate generated from existing payment!',
+                    data: {
+                        payment: existingPayment,
+                        certificate
+                    }
+                });
+            } else {
+                return res.status(500).json({
+                    success: false,
+                    message: 'Failed to generate certificate'
+                });
+            }
         }
 
         // Create bypassed payment record
@@ -203,11 +349,28 @@ exports.bypassPayment = async(req, res) => {
             paymentMethod: 'bypass'
         });
 
-        res.status(200).json({
-            success: true,
-            message: 'Payment bypassed for testing',
-            data: payment
-        });
+        console.log('✅ Payment bypassed:', payment._id);
+
+        // Auto-generate certificate
+        const certificate = await autoGenerateCertificate(userId, courseId, payment._id, enrollment._id);
+
+        if (certificate) {
+            console.log('🎉 Certificate unlocked after bypass payment:', certificate._id);
+            res.status(200).json({
+                success: true,
+                message: 'Payment bypassed and certificate unlocked!',
+                data: {
+                    payment,
+                    certificate
+                }
+            });
+        } else {
+            console.error('❌ Failed to generate certificate after bypass');
+            res.status(500).json({
+                success: false,
+                message: 'Payment bypassed but certificate generation failed'
+            });
+        }
     } catch (error) {
         console.error('Bypass payment error:', error);
         res.status(500).json({

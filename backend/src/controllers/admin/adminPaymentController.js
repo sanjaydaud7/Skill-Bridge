@@ -374,7 +374,7 @@ exports.getPaymentStats = async(req, res) => {
                 pendingPayments,
                 failedPayments,
                 refundedPayments,
-                totalRefunded: refundedAmount[0] ? .total || 0,
+                totalRefunded: (refundedAmount[0] && refundedAmount[0].total) || 0,
                 paymentMethods: {
                     stripe: stripePayments,
                     bypassed: bypassedPayments

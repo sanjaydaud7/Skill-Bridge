@@ -1,5 +1,44 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+  // Helper for beautiful certificate card
+  const renderCertificateCard = cert => (
+    <div
+      key={cert._id}
+      className="certificate-card earned"
+      style={{ cursor: 'pointer', background: 'linear-gradient(135deg, #e0eafc 0%, #f0fff4 100%)', border: '2px solid #28a745', boxShadow: '0 8px 24px rgba(40,167,69,0.08)' }}
+      onClick={() => downloadCertificate(cert._id)}
+    >
+      <div className="certificate-icon" style={{ fontSize: 72, marginBottom: 12 }}>🏅</div>
+      <div className="completion-badge">Payment Successful</div>
+      <h3 style={{ fontWeight: 700, color: '#222', marginBottom: 8 }}>{cert.courseId.title}</h3>
+      <div className="certificate-details">
+        <p className="certificate-number">
+          <span style={{ color: '#333' }}>Certificate No:</span> <strong>{cert.certificateNumber}</strong>
+        </p>
+        <p className="issue-date">
+          <span style={{ color: '#333' }}>Issued:</span> {new Date(cert.issuedAt).toLocaleDateString()}
+        </p>
+        <p className="verification">
+          <span style={{ color: '#333' }}>Verification Code:</span> <code>{cert.verificationCode}</code>
+        </p>
+      </div>
+      <div className="certificate-actions" style={{ marginTop: 16 }}>
+        <button 
+          onClick={e => { e.stopPropagation(); downloadCertificate(cert._id); }}
+          className="btn btn-primary"
+          style={{ marginRight: 8 }}
+        >
+          📥 Download PDF
+        </button>
+        <button 
+          onClick={e => { e.stopPropagation(); window.open(`${API_URL}/certificates/verify/${cert.verificationCode}`, '_blank'); }}
+          className="btn btn-outline"
+        >
+          🔍 Verify
+        </button>
+      </div>
+    </div>
+  );
+import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
 import axios from 'axios';
@@ -10,14 +49,16 @@ const API_URL = 'http://localhost:5000/api';
 const CertificatesView = () => {
   const { token, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const certificateSectionRef = useRef({});
   
   const [enrolledCourses, setEnrolledCourses] = useState([]);
   const [certificates, setCertificates] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedCourse, setSelectedCourse] = useState(null);
-  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [highlightedCourseId, setHighlightedCourseId] = useState(null);
+
   const [processing, setProcessing] = useState(false);
-  const [eligibilityData, setEligibilityData] = useState(null);
+
 
   useEffect(() => {
     if (!isAuthenticated()) {
@@ -46,6 +87,71 @@ const CertificatesView = () => {
     }
   };
 
+  // Get courseId from URL parameter
+  const courseIdFromUrl = searchParams.get('courseId');
+
+  // Handle auto-scroll and highlight when courseId is passed via URL
+  useEffect(() => {
+    const courseIdFromUrl = searchParams.get('courseId');
+    const paymentSuccess = searchParams.get('success');
+    const paymentCanceled = searchParams.get('canceled');
+    
+    // Show success message for Stripe payment
+    if (paymentSuccess === 'true') {
+      // Wait a bit for webhook to process, then refresh and show success
+      setTimeout(() => {
+        fetchData().then(() => {
+          alert('🎉 Payment successful! Your certificate has been unlocked automatically.');
+          // Scroll to top to show certificate
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          // Remove success param from URL
+          const newParams = new URLSearchParams(searchParams);
+          newParams.delete('success');
+          newParams.delete('session_id');
+          navigate(`/dashboard/certificates${newParams.toString() ? '?' + newParams.toString() : ''}`, { replace: true });
+        });
+      }, 1000); // 1 second delay to allow webhook processing
+      return;
+    }
+    
+    // Show canceled message
+    if (paymentCanceled === 'true') {
+      alert('❌ Payment was canceled. You can try again anytime.');
+      const newParams = new URLSearchParams(searchParams);
+      newParams.delete('canceled');
+      navigate(`/dashboard/certificates${newParams.toString() ? '?' + newParams.toString() : ''}`, { replace: true });
+      return;
+    }
+    
+    if (courseIdFromUrl && enrolledCourses.length > 0) {
+      // Find the course
+      const targetCourse = enrolledCourses.find(
+        course => course.courseId._id === courseIdFromUrl
+      );
+
+      if (targetCourse) {
+        // Highlight the course
+        setHighlightedCourseId(courseIdFromUrl);
+
+        // Scroll to the certificate section after a brief delay
+        setTimeout(() => {
+          const element = certificateSectionRef.current[courseIdFromUrl];
+          if (element) {
+            element.scrollIntoView({ 
+              behavior: 'smooth', 
+              block: 'center' 
+            });
+          }
+        }, 500);
+
+        // Remove highlight after 3 seconds
+        setTimeout(() => {
+          setHighlightedCourseId(null);
+        }, 3500);
+      }
+    }
+  }, [searchParams, enrolledCourses, navigate]);
+
   const checkEligibility = async (courseId) => {
     try {
       const config = { headers: { Authorization: `Bearer ${token}` } };
@@ -60,60 +166,69 @@ const CertificatesView = () => {
     }
   };
 
-  const openPaymentModal = async (course) => {
-    const eligibility = await checkEligibility(course.courseId._id);
-    
-    if (!eligibility || !eligibility.eligible) {
-      alert(eligibility?.message || 'You are not eligible for certificate yet');
+
+
+  const handleBypassPayment = async (course) => {
+    if (!course) {
+      alert('Please select a course first');
       return;
     }
 
-    setSelectedCourse(course);
-    setEligibilityData(eligibility);
-    setShowPaymentModal(true);
-  };
-
-  const closeModal = () => {
-    setShowPaymentModal(false);
-    setSelectedCourse(null);
-    setEligibilityData(null);
-  };
-
-  const handleBypassPayment = async () => {
-    if (!selectedCourse) return;
+    if (!window.confirm('🧪 TEST MODE: Generate certificate for free?')) {
+      return;
+    }
 
     setProcessing(true);
 
     try {
       const config = { headers: { Authorization: `Bearer ${token}` } };
       
-      // Bypass payment (testing mode)
-      await axios.post(
-        `${API_URL}/payments/bypass/${selectedCourse.courseId._id}`,
+      console.log('Bypassing payment for course:', course.courseId._id);
+      
+      // Bypass payment (certificate is auto-generated)
+      const response = await axios.post(
+        `${API_URL}/payments/bypass/${course.courseId._id}`,
         {},
         config
       );
 
-      // Generate certificate
-      const certResponse = await axios.post(
-        `${API_URL}/certificates/${selectedCourse.courseId._id}/generate`,
-        {},
-        config
-      );
+      console.log('Payment and certificate response:', response.data);
 
-      alert('🎉 Certificate generated successfully!');
-      closeModal();
-      fetchData(); // Refresh data
+      // Refresh data to show certificate
+      await fetchData();
+
+      // Check if certificate was generated
+      if (response.data.data?.certificate) {
+        alert('🎉 Payment completed and certificate unlocked successfully!\n\nYour certificate is now available. Scroll up to view and download it.');
+        
+        // Scroll to top to show the certificate
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        alert('✅ Payment completed successfully!');
+      }
     } catch (error) {
-      console.error('Error generating certificate:', error);
-      alert(error.response?.data?.message || 'Failed to generate certificate');
+      console.error('Error processing payment:', error);
+      console.error('Error response:', error.response?.data);
+      
+      // Check if certificate already issued
+      if (error.response?.data?.alreadyIssued) {
+        alert('✅ Certificate already issued! Refreshing...');
+        await fetchData();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        const errorMsg = error.response?.data?.message || error.message;
+        alert(`❌ Error: ${errorMsg}`);
+      }
     } finally {
       setProcessing(false);
     }
   };
 
-  const handleStripePayment = async () => {
-    if (!selectedCourse) return;
+  const handleStripePayment = async (course) => {
+    if (!course) {
+      alert('Please select a course first');
+      return;
+    }
 
     setProcessing(true);
 
@@ -122,15 +237,36 @@ const CertificatesView = () => {
       
       const response = await axios.post(
         `${API_URL}/payments/create-checkout`,
-        { courseId: selectedCourse.courseId._id },
+        { courseId: course.courseId._id },
         config
       );
 
-      // Redirect to Stripe Checkout
-      window.location.href = response.data.data.url;
+      // Check if certificate was auto-generated (payment already existed)
+      if (response.data.data?.certificate) {
+        await fetchData(); // Refresh to show certificate
+        alert('🎉 Certificate already unlocked from your previous payment!\n\nScroll up to view and download your certificate.');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        setProcessing(false);
+      } else if (response.data.data?.url) {
+        // Redirect to Stripe Checkout
+        window.location.href = response.data.data.url;
+      } else {
+        await fetchData();
+        alert('✅ Payment processed successfully!');
+        setProcessing(false);
+      }
     } catch (error) {
       console.error('Error creating checkout:', error);
-      alert(error.response?.data?.message || 'Failed to create payment session');
+      const errorData = error.response?.data;
+      
+      // Check if certificate already exists
+      if (errorData?.certificateExists) {
+        alert('✅ Certificate already issued for this course! Refreshing...');
+        await fetchData();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        alert(errorData?.message || 'Failed to create payment session');
+      }
       setProcessing(false);
     }
   };
@@ -174,12 +310,34 @@ const CertificatesView = () => {
   }
 
   // Separate courses into eligible and ineligible
-  const completedCourses = enrolledCourses.filter(
+  let completedCourses = enrolledCourses.filter(
     course => course.progress?.completionPercentage === 100
   );
+  
+  // Filter by courseId if provided in URL
+  if (courseIdFromUrl) {
+    completedCourses = completedCourses.filter(
+      course => course.courseId._id === courseIdFromUrl
+    );
+  }
+  
   const hasCertificate = (courseId) => {
     return certificates.some(cert => cert.courseId._id === courseId);
   };
+  
+  // Filter certificates by courseId if provided
+    // Only show certificates with successful payment
+    let displayCertificates = certificates.filter(cert => cert.paymentId && cert.paymentId.status === 'completed');
+  let inProgressCourses = enrolledCourses.filter(c => c.progress?.completionPercentage < 100);
+  
+  if (courseIdFromUrl) {
+    displayCertificates = certificates.filter(
+      cert => cert.courseId._id === courseIdFromUrl
+    );
+    inProgressCourses = inProgressCourses.filter(
+      course => course.courseId._id === courseIdFromUrl
+    );
+  }
 
   return (
     <div className="dashboard-layout">
@@ -190,45 +348,42 @@ const CertificatesView = () => {
             ← Back to Dashboard
           </button>
           <h1>🏆 Certificates</h1>
-          <p className="subtitle">Showcase your achievements with verified certificates</p>
+          <p className="subtitle">
+            {courseIdFromUrl 
+              ? 'Certificate for your completed course' 
+              : 'Showcase your achievements with verified certificates'
+            }
+          </p>
+          {courseIdFromUrl && (
+            <button 
+              onClick={() => navigate('/dashboard/certificates')} 
+              className="btn btn-outline"
+              style={{ marginTop: '10px' }}
+            >
+              📜 View All Certificates
+            </button>
+          )}
         </div>
 
         {/* Earned Certificates */}
-        {certificates.length > 0 && (
+        {displayCertificates.length > 0 && (
           <div className="certificates-section">
             <h2>📜 Your Certificates</h2>
+            {courseIdFromUrl && displayCertificates.length > 0 && (
+              <div className="success-banner" style={{
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                color: 'white',
+                padding: '20px',
+                borderRadius: '12px',
+                marginBottom: '20px',
+                textAlign: 'center'
+              }}>
+                <h3 style={{ margin: '0 0 8px 0' }}>🎉 Congratulations!</h3>
+                <p style={{ margin: 0 }}>Your certificate is ready! Download it below.</p>
+              </div>
+            )}
             <div className="certificates-grid">
-              {certificates.map((cert) => (
-                <div key={cert._id} className="certificate-card earned">
-                  <div className="certificate-icon">🏅</div>
-                  <h3>{cert.courseId.title}</h3>
-                  <div className="certificate-details">
-                    <p className="certificate-number">
-                      Certificate No: <strong>{cert.certificateNumber}</strong>
-                    </p>
-                    <p className="issue-date">
-                      Issued: {new Date(cert.issuedDate).toLocaleDateString()}
-                    </p>
-                    <p className="verification">
-                      Verification Code: <code>{cert.verificationCode}</code>
-                    </p>
-                  </div>
-                  <div className="certificate-actions">
-                    <button 
-                      onClick={() => downloadCertificate(cert._id)}
-                      className="btn btn-primary"
-                    >
-                      📥 Download PDF
-                    </button>
-                    <button 
-                      onClick={() => window.open(`${API_URL}/certificates/verify/${cert.verificationCode}`, '_blank')}
-                      className="btn btn-outline"
-                    >
-                      🔍 Verify
-                    </button>
-                  </div>
-                </div>
-              ))}
+              {displayCertificates.map(renderCertificateCard)}
             </div>
           </div>
         )}
@@ -237,47 +392,160 @@ const CertificatesView = () => {
         {completedCourses.length > 0 && (
           <div className="certificates-section">
             <h2>🎯 Available Certificates</h2>
-            <div className="certificates-grid">
-              {completedCourses.map((course) => {
-                const alreadyHasCert = hasCertificate(course.courseId._id);
-                
-                if (alreadyHasCert) return null;
+            
+            {completedCourses.map((course) => {
+              const alreadyHasCert = hasCertificate(course.courseId._id);
+              
+              if (alreadyHasCert) return null;
 
-                return (
-                  <div key={course._id} className="certificate-card available">
-                    <div className="certificate-icon">📄</div>
-                    <h3>{course.courseId.title}</h3>
-                    <div className="completion-badge">
-                      ✅ Course Completed
-                    </div>
-                    <div className="certificate-details">
-                      <p>You've successfully completed all requirements!</p>
-                      <div className="price">
-                        <span className="price-label">Certificate Fee:</span>
-                        <span className="price-value">₹{course.courseId.certificatePrice}</span>
+              return (
+                <div 
+                  key={course._id} 
+                  className={`certificate-unlock-section ${highlightedCourseId === course.courseId._id ? 'highlighted' : ''}`}
+                  ref={(el) => certificateSectionRef.current[course.courseId._id] = el}
+                >
+                  {/* Left: Certificate Preview */}
+                  <div className="certificate-preview">
+                    <div className="certificate-frame locked">
+                      <div className="certificate-header-design">
+                        <div className="certificate-logo">🎓</div>
+                        <h3>SkillBridge</h3>
+                        <p className="certificate-subtitle">Certificate of Completion</p>
+                      </div>
+                      
+                      <div className="certificate-body">
+                        <p className="certificate-text">This is to certify that</p>
+                        <h2 className="student-name">[Your Name]</h2>
+                        <p className="certificate-text">has successfully completed</p>
+                        <h3 className="course-name">{course.courseId.title}</h3>
+                        
+                        <div className="certificate-details-grid">
+                          <div className="detail-item">
+                            <span className="detail-label">Duration:</span>
+                            <span className="detail-value">{course.courseId.duration} weeks</span>
+                          </div>
+                          <div className="detail-item">
+                            <span className="detail-label">Category:</span>
+                            <span className="detail-value">{course.courseId.category}</span>
+                          </div>
+                          <div className="detail-item">
+                            <span className="detail-label">Grade:</span>
+                            <span className="detail-value">A</span>
+                          </div>
+                          <div className="detail-item">
+                            <span className="detail-label">Date:</span>
+                            <span className="detail-value">{new Date().toLocaleDateString()}</span>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="certificate-footer">
+                        <div className="signature-line">
+                          <div className="signature">
+                            <div className="signature-img">✍️</div>
+                            <p>Authorized Signature</p>
+                          </div>
+                        </div>
+                        <div className="certificate-seal">
+                          <div className="seal">🏆</div>
+                          <p>Official Seal</p>
+                        </div>
+                      </div>
+                      
+                      {/* Lock Overlay */}
+                      <div className="certificate-lock-overlay">
+                        <div className="lock-icon">🔒</div>
+                        <p className="lock-message">Complete Payment to Unlock</p>
                       </div>
                     </div>
-                    <button 
-                      onClick={() => openPaymentModal(course)}
-                      className="btn btn-success"
-                    >
-                      🛒 Get Certificate
-                    </button>
                   </div>
-                );
-              })}
-            </div>
+
+                  {/* Right: Payment Options */}
+                  <div className="payment-options-panel">
+                    <div className="completion-status">
+                      <h3>✅ All Requirements Completed!</h3>
+                      <div className="completion-checklist">
+                        <div className="check-item">
+                          <span className="check-icon">✓</span>
+                          <span>All videos watched</span>
+                        </div>
+                        <div className="check-item">
+                          <span className="check-icon">✓</span>
+                          <span>All tasks approved</span>
+                        </div>
+                        <div className="check-item">
+                          <span className="check-icon">✓</span>
+                          <span>Final project approved</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="payment-section">
+                      <div className="price-display">
+                        <span className="price-label">Certificate Fee</span>
+                        <span className="price-amount">₹{course.courseId.certificatePrice}</span>
+                      </div>
+
+                      <div className="payment-methods-list">
+                        {/* Test Mode Bypass */}
+                        <div className="payment-method-card bypass-card">
+                          <div className="method-header">
+                            <span className="method-icon">🧪</span>
+                            <div>
+                              <h4>Test Mode</h4>
+                              <p>Bypass payment for testing</p>
+                            </div>
+                          </div>
+                          <button 
+                            onClick={() => handleBypassPayment(course)}
+                            className="btn-bypass"
+                            disabled={processing}
+                          >
+                            {processing ? '⏳ Processing...' : '⚡ Generate Certificate (Free Test)'}
+                          </button>
+                        </div>
+
+                        {/* Stripe Payment */}
+                        <div className="divider-text">OR PAY OFFICIALLY</div>
+                        
+                        <div className="payment-method-card stripe-card">
+                          <div className="method-header">
+                            <span className="method-icon">💳</span>
+                            <div>
+                              <h4>Stripe Payment</h4>
+                              <p>Secure payment gateway</p>
+                            </div>
+                          </div>
+                          <button 
+                            onClick={() => handleStripePayment(course)}
+                            className="btn-stripe"
+                            disabled={processing}
+                          >
+                            {processing ? '⏳ Processing...' : `💳 Pay ₹${course.courseId.certificatePrice}`}
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="payment-security-note">
+                        <p>🔒 Secure & encrypted payment</p>
+                        <p>📧 Instant certificate delivery</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
 
+
+
         {/* In Progress */}
-        {enrolledCourses.filter(c => c.progress?.completionPercentage < 100).length > 0 && (
+        {inProgressCourses.length > 0 && (
           <div className="certificates-section">
             <h2>⏳ In Progress</h2>
             <div className="certificates-grid">
-              {enrolledCourses
-                .filter(course => course.progress?.completionPercentage < 100)
-                .map((course) => (
+              {inProgressCourses.map((course) => (
                   <div key={course._id} className="certificate-card in-progress">
                     <div className="certificate-icon">📚</div>
                     <h3>{course.courseId.title}</h3>
@@ -306,7 +574,7 @@ const CertificatesView = () => {
         )}
 
         {/* Empty State */}
-        {enrolledCourses.length === 0 && (
+        {!courseIdFromUrl && enrolledCourses.length === 0 && (
           <div className="empty-state">
             <div className="empty-icon">🎓</div>
             <h2>No courses enrolled yet</h2>
@@ -317,91 +585,19 @@ const CertificatesView = () => {
           </div>
         )}
 
-        {/* Payment Modal */}
-        {showPaymentModal && selectedCourse && (
-          <div className="modal-overlay" onClick={closeModal}>
-            <div className="modal-content payment-modal" onClick={(e) => e.stopPropagation()}>
-              <div className="modal-header">
-                <h2>🏆 Get Your Certificate</h2>
-                <button className="modal-close" onClick={closeModal}>×</button>
-              </div>
-
-              <div className="payment-modal-body">
-                <div className="course-summary">
-                  <h3>{selectedCourse.courseId.title}</h3>
-                  <div className="completion-stats">
-                    <div className="stat">
-                      <span className="stat-icon">✅</span>
-                      <span>All videos completed</span>
-                    </div>
-                    <div className="stat">
-                      <span className="stat-icon">✅</span>
-                      <span>All tasks approved</span>
-                    </div>
-                    <div className="stat">
-                      <span className="stat-icon">✅</span>
-                      <span>Final project approved</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="payment-amount">
-                  <span className="amount-label">Certificate Fee</span>
-                  <span className="amount-value">₹{selectedCourse.courseId.certificatePrice}</span>
-                </div>
-
-                <div className="payment-methods">
-                  <h4>Choose Payment Method</h4>
-                  
-                  {/* Bypass Button for Testing */}
-                  <div className="payment-option bypass-option">
-                    <div className="option-header">
-                      <span className="option-icon">🧪</span>
-                      <div className="option-info">
-                        <h5>Test Mode - Bypass Payment</h5>
-                        <p>For development and testing purposes only</p>
-                      </div>
-                    </div>
-                    <button 
-                      onClick={handleBypassPayment}
-                      className="btn btn-warning btn-full"
-                      disabled={processing}
-                    >
-                      {processing ? 'Processing...' : '⚡ Generate Certificate (Test Mode)'}
-                    </button>
-                  </div>
-
-                  {/* Stripe Payment */}
-                  <div className="payment-divider">
-                    <span>OR</span>
-                  </div>
-
-                  <div className="payment-option stripe-option">
-                    <div className="option-header">
-                      <span className="option-icon">💳</span>
-                      <div className="option-info">
-                        <h5>Pay with Stripe</h5>
-                        <p>Secure payment via credit/debit card</p>
-                      </div>
-                    </div>
-                    <button 
-                      onClick={handleStripePayment}
-                      className="btn btn-primary btn-full"
-                      disabled={processing}
-                    >
-                      {processing ? 'Redirecting...' : '💳 Pay ₹' + selectedCourse.courseId.certificatePrice}
-                    </button>
-                  </div>
-                </div>
-
-                <div className="payment-note">
-                  <p>🔒 Your payment is secure and encrypted</p>
-                  <p>📧 Certificate will be generated instantly after payment</p>
-                </div>
-              </div>
-            </div>
+        {/* No certificate for specific course */}
+        {courseIdFromUrl && displayCertificates.length === 0 && completedCourses.length === 0 && inProgressCourses.length === 0 && (
+          <div className="empty-state">
+            <div className="empty-icon">📚</div>
+            <h2>Course not found or not completed</h2>
+            <p>Complete the course requirements to earn your certificate</p>
+            <button onClick={() => navigate('/dashboard/certificates')} className="btn btn-primary">
+              View All Certificates
+            </button>
           </div>
         )}
+
+
       </div>
     </div>
   );

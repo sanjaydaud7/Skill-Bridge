@@ -58,7 +58,14 @@ const certificateSchema = new mongoose.Schema({
         type: String
     }
 }, {
-    timestamps: true
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
+});
+
+// Virtual for backward compatibility
+certificateSchema.virtual('issuedDate').get(function() {
+    return this.issuedAt;
 });
 
 // Generate certificate number before saving
@@ -78,7 +85,6 @@ certificateSchema.pre('save', function(next) {
 
 // Indexes
 certificateSchema.index({ userId: 1, courseId: 1 });
-certificateSchema.index({ certificateNumber: 1 });
-certificateSchema.index({ verificationCode: 1 });
+// Removed duplicate indexes for certificateNumber and verificationCode
 
 module.exports = mongoose.model('Certificate', certificateSchema);

@@ -36,36 +36,37 @@ exports.checkEligibility = async(req, res) => {
 
         // Get course details
         const course = await Course.findById(courseId);
-        const totalTasks = await Task.countDocuments({ courseId, isActive: true });
-
-        // Check all tasks approved
-        const approvedTasks = await TaskSubmission.countDocuments({
-            userId,
-            courseId,
-            status: 'approved'
-        });
-
-        // Check project approved
-        const projectSubmission = await ProjectSubmission.findOne({
-            userId,
-            courseId,
-            status: 'approved'
-        });
+        const totalTasks = await Task.countDocuments({ courseId });
 
         // Check videos completed (100%)
         const completionPercentage = enrollment.progress.completionPercentage;
+        const videosCompleted = completionPercentage === 100;
 
-        const eligible =
-            approvedTasks >= totalTasks &&
-            projectSubmission &&
-            completionPercentage === 100;
+        // Check tasks - use enrollment.progress for bypass support
+        const completedTasksCount = enrollment.progress.tasksCompleted.length;
+        const tasksApproved = completedTasksCount >= totalTasks || enrollment.progress.completionPercentage === 100;
+
+        // Check project - use enrollment.progress for bypass support
+        const projectApproved = enrollment.progress.projectApproved === true;
+
+        const eligible = videosCompleted && tasksApproved && projectApproved;
 
         const requirements = {
-            videosCompleted: completionPercentage === 100,
-            tasksApproved: approvedTasks >= totalTasks,
-            projectApproved: !!projectSubmission,
+            videosCompleted,
+            tasksApproved,
+            projectApproved,
             allRequirementsMet: eligible
         };
+
+        console.log('Certificate eligibility check:', {
+            userId,
+            courseId,
+            completionPercentage,
+            completedTasksCount,
+            totalTasks,
+            projectApproved,
+            eligible
+        });
 
         res.status(200).json({
             success: true,
@@ -73,7 +74,8 @@ exports.checkEligibility = async(req, res) => {
             alreadyIssued: false,
             requirements,
             courseTitle: course.title,
-            certificatePrice: course.certificatePrice
+            certificatePrice: course.certificatePrice,
+            message: eligible ? 'You are eligible for the certificate!' : 'Complete all requirements to unlock certificate'
         });
     } catch (error) {
         console.error('Check eligibility error:', error);
@@ -93,10 +95,11 @@ exports.generateCertificate = async(req, res) => {
         const { paymentId } = req.body;
         const userId = req.user.id;
 
+        console.log('Generating certificate for:', { userId, courseId, paymentId });
+
         // Get enrollment and course
         const enrollment = await Enrollment.findOne({ userId, courseId });
         const course = await Course.findById(courseId);
-        const user = req.user;
 
         if (!enrollment || !course) {
             return res.status(404).json({
@@ -105,41 +108,74 @@ exports.generateCertificate = async(req, res) => {
             });
         }
 
+        // If payment is bypassed, skip progress checks
+        if (!(paymentId === 'BYPASS' || paymentId === '' || paymentId === undefined)) {
+            // Check progress requirements
+            const completionPercentage = enrollment.progress.completionPercentage;
+            const videosCompleted = completionPercentage === 100;
+            const totalTasks = await Task.countDocuments({ courseId });
+            const completedTasksCount = enrollment.progress.tasksCompleted.length;
+            const tasksApproved = completedTasksCount >= totalTasks || completionPercentage === 100;
+            const projectApproved = enrollment.progress.projectApproved === true;
+            const eligible = videosCompleted && tasksApproved && projectApproved;
+            if (!eligible) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Course requirements not completed for certificate.'
+                });
+            }
+        }
+
         // Check if certificate already exists
         const existingCertificate = await Certificate.findOne({ userId, courseId });
         if (existingCertificate) {
-            return res.status(400).json({
-                success: false,
-                message: 'Certificate already issued'
+            return res.status(200).json({
+                success: true,
+                message: 'Certificate already issued',
+                data: existingCertificate
             });
         }
 
-        // Verify payment
-        const payment = await Payment.findById(paymentId);
-        if (!payment || payment.userId.toString() !== userId || payment.status !== 'completed') {
-            return res.status(400).json({
-                success: false,
-                message: 'Valid payment not found'
-            });
+        // Verify payment if paymentId provided
+        let payment = null;
+        if (paymentId === 'BYPASS' || paymentId === '' || paymentId === undefined) {
+            // Payment bypass logic: create a dummy payment object
+            payment = { _id: null };
+        } else if (paymentId) {
+            payment = await Payment.findById(paymentId);
+            if (!payment || payment.userId.toString() !== userId || payment.status !== 'completed') {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Valid payment not found'
+                });
+            }
+        } else {
+            // If no paymentId, look for any completed payment for this course
+            payment = await Payment.findOne({
+                userId,
+                courseId,
+                status: 'completed'
+            }).sort({ paidAt: -1 });
+            if (!payment) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Payment required to generate certificate'
+                });
+            }
         }
 
-        // Get project grade
-        const projectSubmission = await ProjectSubmission.findOne({
-            userId,
-            courseId,
-            status: 'approved'
-        });
+        console.log('Payment verified:', payment._id);
 
-        // Create certificate
-        const certificate = await Certificate.create({
+        // Create certificate (use constructor and save to trigger pre-save hook)
+        const certificate = new Certificate({
             userId,
             courseId,
             enrollmentId: enrollment._id,
             paymentId: payment._id,
-            // grade: projectSubmission ? .grade || 'B',
-            skills: course.skills,
-            issuedAt: new Date()
+            grade: 'A', // Default grade for bypass
+            skills: course.skills || []
         });
+        await certificate.save();
 
         // Update enrollment
         enrollment.status = 'certificate-purchased';
@@ -147,10 +183,11 @@ exports.generateCertificate = async(req, res) => {
         enrollment.completedAt = new Date();
         await enrollment.save();
 
-        // TODO: Generate PDF using PDFKit and upload to Cloudinary
-        // For now, we'll set a placeholder URL
+        // Set placeholder PDF URL
         certificate.pdfUrl = `https://certificates.skillbridge.com/${certificate.certificateNumber}.pdf`;
         await certificate.save();
+
+        console.log('Certificate generated successfully:', certificate._id);
 
         res.status(201).json({
             success: true,
@@ -159,9 +196,17 @@ exports.generateCertificate = async(req, res) => {
         });
     } catch (error) {
         console.error('Generate certificate error:', error);
+        console.error('Error stack:', error.stack);
+        console.error('Error details:', {
+            name: error.name,
+            message: error.message,
+            code: error.code
+        });
         res.status(500).json({
             success: false,
-            message: 'Server error while generating certificate'
+            message: 'Server error while generating certificate',
+            error: error.message,
+            details: process.env.NODE_ENV === 'development' ? error.stack : undefined
         });
     }
 };

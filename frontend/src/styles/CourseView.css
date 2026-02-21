@@ -60,6 +60,40 @@
     margin-bottom: 32px;
 }
 
+.progress-info-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 12px;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.bypass-btn {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
+    white-space: nowrap;
+}
+
+.bypass-btn:hover {
+    background: linear-gradient(135deg, #ff5252 0%, #d43f52 100%);
+    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
+    transform: translateY(-1px);
+}
+
+.bypass-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(255, 107, 107, 0.3);
+}
+
 
 /* Video Section */
 
@@ -90,10 +124,14 @@
     margin-bottom: 20px;
 }
 
-.video-player-wrapper>div {
+.video-player-wrapper > div,
+.video-player-wrapper > iframe,
+.video-player-wrapper > video {
     position: absolute;
     top: 0;
     left: 0;
+    width: 100%;
+    height: 100%;
 }
 
 .video-completed-message {
@@ -217,7 +255,7 @@
 .curriculum-list {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 8px;
     max-height: 500px;
     overflow-y: auto;
     padding-right: 8px;
@@ -237,6 +275,10 @@
     border-radius: 3px;
 }
 
+.curriculum-module-wrapper {
+    margin-bottom: 8px;
+}
+
 .curriculum-item {
     display: flex;
     gap: 12px;
@@ -246,6 +288,7 @@
     cursor: pointer;
     transition: all 0.3s ease;
     border: 2px solid transparent;
+    position: relative;
 }
 
 .curriculum-item:hover {
@@ -261,6 +304,17 @@
 
 .curriculum-item.completed .module-number {
     background: #28a745;
+    color: white;
+}
+
+.expand-icon {
+    font-size: 12px;
+    margin-left: auto;
+    padding-left: 8px;
+    opacity: 0.7;
+}
+
+.curriculum-item.active .expand-icon {
     color: white;
 }
 
@@ -283,6 +337,10 @@
     color: #667eea;
 }
 
+.module-info {
+    flex: 1;
+}
+
 .module-info h4 {
     font-size: 14px;
     font-weight: 600;
@@ -293,6 +351,87 @@
 .module-info p {
     font-size: 12px;
     opacity: 0.8;
+}
+
+/* Day-wise Videos List */
+.videos-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 8px;
+    padding-left: 20px;
+}
+
+.video-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: white;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 1px solid #e0e0e0;
+}
+
+.video-item:hover {
+    background: #f5f7fa;
+    border-color: #667eea;
+    transform: translateX(4px);
+}
+
+.video-item.active-video {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    border-color: #667eea;
+}
+
+.video-play-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #667eea;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    padding-left: 2px;
+    flex-shrink: 0;
+}
+
+.video-item:hover .video-play-icon {
+    background: #764ba2;
+}
+
+.video-item.active-video .video-play-icon {
+    background: #667eea;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+.video-item-info {
+    flex: 1;
+}
+
+.video-item-info h5 {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 2px;
+    line-height: 1.3;
+}
+
+.video-duration {
+    font-size: 11px;
+    color: #666;
 }
 
 
@@ -401,6 +540,42 @@
 .requirements-list li.done {
     color: #28a745;
     font-weight: 600;
+}
+
+
+/* Certificate Ready */
+
+.certificate-ready {
+    padding: 20px;
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    border-radius: 12px;
+    text-align: center;
+    border: 2px solid #28a745;
+}
+
+.ready-badge {
+    display: inline-block;
+    background: #28a745;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 12px;
+}
+
+.ready-message {
+    font-size: 14px;
+    color: #155724;
+    margin-bottom: 16px;
+    font-weight: 500;
+}
+
+.certificate-note {
+    font-size: 12px;
+    color: #666;
+    margin-top: 8px;
+    font-style: italic;
 }
 
 

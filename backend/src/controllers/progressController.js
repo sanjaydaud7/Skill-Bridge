@@ -179,3 +179,110 @@ exports.getUserStats = async(req, res) => {
         });
     }
 };
+
+// @desc    Bypass completion - Mark all course requirements as complete (TESTING ONLY)
+// @route   POST /api/progress/:courseId/bypass-complete
+// @access  Private
+exports.bypassCompleteAll = async(req, res) => {
+    try {
+        const { courseId } = req.params;
+        const userId = req.user.id;
+
+        console.log('Bypass completion started for courseId:', courseId, 'userId:', userId);
+
+        const enrollment = await Enrollment.findOne({ userId, courseId });
+
+        if (!enrollment) {
+            console.log('Enrollment not found');
+            return res.status(404).json({
+                success: false,
+                message: 'Enrollment not found'
+            });
+        }
+
+        console.log('Enrollment found:', enrollment._id);
+
+        // Get all modules
+        const modules = await Module.find({ courseId });
+        console.log('Modules found:', modules.length);
+        
+        // Get all tasks
+        const Task = require('../models/Task');
+        const tasks = await Task.find({ courseId });
+        console.log('Tasks found:', tasks.length);
+
+        let videosCompleted = 0;
+        let tasksCompleted = 0;
+
+        // Mark all videos as completed
+        for (const module of modules) {
+            const alreadyCompleted = enrollment.progress.videosCompleted.some(
+                v => v.moduleId.toString() === module._id.toString()
+            );
+            
+            if (!alreadyCompleted) {
+                enrollment.progress.videosCompleted.push({
+                    moduleId: module._id,
+                    completedAt: new Date()
+                });
+                videosCompleted++;
+            }
+        }
+
+        console.log('Videos marked as completed:', videosCompleted);
+
+        // Mark all tasks as completed
+        for (const task of tasks) {
+            const alreadyCompleted = enrollment.progress.tasksCompleted.some(
+                t => t.taskId.toString() === task._id.toString()
+            );
+            
+            if (!alreadyCompleted) {
+                enrollment.progress.tasksCompleted.push({
+                    taskId: task._id,
+                    completedAt: new Date()
+                });
+                tasksCompleted++;
+            }
+        }
+
+        console.log('Tasks marked as completed:', tasksCompleted);
+
+        // Mark project as submitted and approved
+        enrollment.progress.projectSubmitted = true;
+        enrollment.progress.projectApproved = true;
+
+        // Update status
+        enrollment.status = 'completed';
+        enrollment.completedAt = new Date();
+
+        // Set completion percentage to 100%
+        enrollment.progress.completionPercentage = 100;
+
+        enrollment.lastAccessedAt = new Date();
+        
+        console.log('Saving enrollment...');
+        await enrollment.save();
+        console.log('Enrollment saved successfully');
+
+        res.status(200).json({
+            success: true,
+            message: 'All course requirements marked as complete',
+            data: {
+                videosCompleted,
+                tasksCompleted,
+                projectApproved: true,
+                completionPercentage: 100,
+                enrollment
+            }
+        });
+    } catch (error) {
+        console.error('Bypass complete all error:', error);
+        console.error('Error stack:', error.stack);
+        res.status(500).json({
+            success: false,
+            message: 'Server error while bypassing completion',
+            error: error.message
+        });
+    }
+};
