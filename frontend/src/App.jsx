@@ -6,12 +6,12 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import StudentDashboard from './pages/StudentDashboard';
 import InternshipDetail from './pages/InternshipDetail';
-import CourseView from './pages/CourseView';
+import InternshipView from './pages/InternshipView';
 import TasksView from './pages/TasksView';
 import CertificatesView from './pages/CertificatesView';
 import AdminRoute from './components/admin/AdminRoute';
 import AdminDashboard from './pages/admin/AdminDashboard';
-import AdminCourses from './pages/admin/AdminCourses';
+import AdminInternships from './pages/admin/AdminInternships';
 import AdminSubmissions from './pages/admin/AdminSubmissions';
 import AdminEnrollments from './pages/admin/AdminEnrollments';
 import AdminUsers from './pages/admin/AdminUsers';
@@ -28,14 +28,14 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/internship/:id" element={<InternshipDetail />} />
         <Route path="/dashboard" element={<StudentDashboard />} />
-        <Route path="/dashboard/course/:courseId" element={<CourseView />} />
-        <Route path="/dashboard/course/:courseId/tasks" element={<TasksView />} />
+        <Route path="/dashboard/internship/:courseId" element={<InternshipView />} />
+        <Route path="/dashboard/internship/:courseId/tasks" element={<TasksView />} />
         <Route path="/dashboard/certificates" element={<CertificatesView />} />
         
         {/* Admin Routes */}
         <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
         <Route path="/admin/dashboard" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
-        <Route path="/admin/courses" element={<AdminRoute><AdminCourses /></AdminRoute>} />
+        <Route path="/admin/internships" element={<AdminRoute><AdminInternships /></AdminRoute>} />
         <Route path="/admin/submissions" element={<AdminRoute><AdminSubmissions /></AdminRoute>} />
         <Route path="/admin/enrollments" element={<AdminRoute><AdminEnrollments /></AdminRoute>} />
         <Route path="/admin/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />

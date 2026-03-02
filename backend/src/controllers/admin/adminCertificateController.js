@@ -1,6 +1,6 @@
 const Certificate = require('../../models/Certificate');
 const User = require('../../models/User');
-const Course = require('../../models/Course');
+const Internship = require('../../models/Internship');
 const Enrollment = require('../../models/Enrollment');
 const Payment = require('../../models/Payment');
 const AdminLog = require('../../models/AdminLog');
@@ -106,7 +106,7 @@ exports.manualIssueCertificate = async(req, res) => {
             });
         }
 
-        const course = await Course.findById(courseId);
+        const course = await Internship.findById(courseId);
         if (!course) {
             return res.status(404).json({
                 success: false,
@@ -119,7 +119,7 @@ exports.manualIssueCertificate = async(req, res) => {
         if (!enrollment) {
             return res.status(400).json({
                 success: false,
-                message: 'User is not enrolled in this course'
+                message: 'User is Not enrolled in this internship'
             });
         }
 
@@ -138,13 +138,13 @@ exports.manualIssueCertificate = async(req, res) => {
             const tasksCompleted = (enrollment.progress && enrollment.progress.tasksCompleted && enrollment.progress.tasksCompleted.length) || 0;
             const projectApproved = (enrollment.progress && enrollment.progress.projectApproved) || false;
 
-            if (completionPercentage < 100 || tasksCompleted < course.totalTasks || !projectApproved) {
+            if (completionPercentage < 100 || tasksCompleted < Internship.totalTasks || !projectApproved) {
                 return res.status(400).json({
                     success: false,
                     message: 'Student has not completed all requirements',
                     eligibility: {
                         videosCompleted: completionPercentage === 100,
-                        tasksCompleted: tasksCompleted >= course.totalTasks,
+                        tasksCompleted: tasksCompleted >= Internship.totalTasks,
                         projectApproved
                     }
                 });
@@ -166,7 +166,7 @@ exports.manualIssueCertificate = async(req, res) => {
             verificationCode,
             issuedAt: Date.now(),
             grade: grade || 'A',
-            skills: course.skills,
+            skills: Internship.skills,
             isValid: true
         });
 
@@ -181,7 +181,7 @@ exports.manualIssueCertificate = async(req, res) => {
             action: 'manual_certificate',
             targetModel: 'Certificate',
             targetId: certificate._id,
-            description: `Manually issued certificate to ${user.name} for ${course.title}`,
+            description: `Manually issued certificate to ${user.name} for ${Internship.title}`,
             ipAddress: req.ip,
             userAgent: req.get('user-agent')
         });
@@ -349,7 +349,7 @@ exports.getCertificateStats = async(req, res) => {
             { $limit: 5 }
         ]);
 
-        const populatedCourses = await Course.populate(certificatesByCourse, {
+        const populatedCourses = await Internship.populate(certificatesByCourse, {
             path: '_id',
             select: 'title'
         });

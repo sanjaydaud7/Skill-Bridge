@@ -113,11 +113,9 @@ const Navbar = () => {
           {isAuthenticated() ? (
             <>
               {user?.role === 'admin' && (
-                <Link to="/admin/dashboard">
-                  <button className="btn btn-gradient admin-panel-btn">
-                    <span style={{ marginRight: '0.5rem' }}>⚙️</span>
-                    Admin Panel
-                  </button>
+                <Link to="/admin/dashboard" className="btn btn-gradient admin-panel-btn">
+                  <span style={{ marginRight: '0.5rem' }}>⚙️</span>
+                  Admin Panel
                 </Link>
               )}
               <div className="profile-menu-container" ref={profileMenuRef}>
@@ -188,12 +186,8 @@ const Navbar = () => {
             </>
           ) : (
             <>
-              <Link to="/login">
-                <button className="btn btn-outline">Login</button>
-              </Link>
-              <Link to="/register">
-                <button className="btn btn-gradient">Register</button>
-              </Link>
+              <Link to="/login" className="btn btn-outline">Login</Link>
+              <Link to="/register" className="btn btn-gradient">Register</Link>
             </>
           )}
         </div>
@@ -273,12 +267,8 @@ const Navbar = () => {
             </div>
           ) : (
             <div className="mobile-cta">
-              <Link to="/login">
-                <button className="btn btn-outline" onClick={closeMobileMenu}>Login</button>
-              </Link>
-              <Link to="/register">
-                <button className="btn btn-gradient" onClick={closeMobileMenu}>Register</button>
-              </Link>
+              <Link to="/login" className="btn btn-outline" onClick={closeMobileMenu}>Login</Link>
+              <Link to="/register" className="btn btn-gradient" onClick={closeMobileMenu}>Register</Link>
             </div>
           )}
         </div>

@@ -9,7 +9,7 @@ const AdminSubmissions = () => {
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
     status: '',
-    course: '',
+    courseId: '',
     sortBy: 'oldest'
   });
   const [page, setPage] = useState(1);
@@ -44,8 +44,8 @@ const AdminSubmissions = () => {
         headers: { Authorization: `Bearer ${token}` }
       });
       
-      setSubmissions(response.data.data?.submissions || []);
-      setTotalPages(response.data.data?.pages || 1);
+      setSubmissions(response.data.data || []);
+      setTotalPages(response.data.pagination?.pages || 1);
     } catch (err) {
       console.error('Fetch submissions error:', err);
     } finally {
@@ -169,11 +169,11 @@ const AdminSubmissions = () => {
                   <div className="submission-header">
                     <div className="student-info">
                       <div className="student-avatar">
-                        {submission.student?.name?.[0]?.toUpperCase() || 'S'}
+                        {submission.userId?.name?.[0]?.toUpperCase() || 'S'}
                       </div>
                       <div>
-                        <div className="student-name">{submission.student?.name}</div>
-                        <div className="student-email">{submission.student?.email}</div>
+                        <div className="student-name">{submission.userId?.name}</div>
+                        <div className="student-email">{submission.userId?.email}</div>
                       </div>
                     </div>
                     <span className={`status-badge ${submission.status}`}>
@@ -185,8 +185,8 @@ const AdminSubmissions = () => {
                     <div className="submission-title">
                       {activeTab === 'tasks' ? submission.task?.title : submission.project?.title}
                     </div>
-                    <div className="submission-course">
-                      {submission.course?.title}
+                    <div className="submission-internship">
+                      {submission.courseId?.title}
                     </div>
                     <div className="submission-date">
                       Submitted: {new Date(submission.submittedAt).toLocaleString()}
@@ -252,11 +252,11 @@ const AdminSubmissions = () => {
                   <h3>Student Information</h3>
                   <div className="info-row">
                     <span>Name:</span>
-                    <strong>{selectedSubmission.student?.name}</strong>
+                    <strong>{selectedSubmission.userId?.name}</strong>
                   </div>
                   <div className="info-row">
                     <span>Email:</span>
-                    <strong>{selectedSubmission.student?.email}</strong>
+                    <strong>{selectedSubmission.userId?.email}</strong>
                   </div>
                 </div>
 

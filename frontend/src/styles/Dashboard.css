@@ -412,48 +412,101 @@
    Courses Grid
    ============================================ */
 
-.courses-grid {
+.internships-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
     gap: 24px;
 }
 
-.course-card {
+.internship-card {
     background: white;
     border-radius: 16px;
     overflow: hidden;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
     transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
 }
 
-.course-card:hover {
+.internship-card:hover {
     transform: translateY(-8px);
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
 }
 
-.course-thumbnail {
+
+/* Thumbnail wrapper for overlay badge */
+
+.internship-thumbnail-wrapper {
+    position: relative;
+    overflow: hidden;
+}
+
+.internship-thumbnail {
     width: 100%;
     height: 200px;
     object-fit: cover;
+    display: block;
+    transition: transform 0.3s ease;
 }
 
-.course-info {
-    padding: 20px;
+.internship-card:hover .internship-thumbnail {
+    transform: scale(1.04);
 }
 
-.course-info h3 {
-    font-size: 18px;
-    font-weight: 600;
+
+/* Status badge overlaid on thumbnail */
+
+.internship-status-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px 4px 6px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    backdrop-filter: blur(6px);
+}
+
+.internship-status-badge.in-progress {
+    background: rgba(102, 126, 234, 0.90);
+    color: white;
+}
+
+.internship-status-badge.completed {
+    background: rgba(67, 233, 123, 0.90);
     color: #1a1a1a;
-    margin-bottom: 12px;
+}
+
+.internship-status-badge .material-icons {
+    font-size: 14px;
+}
+
+
+/* Info section */
+
+.internship-info {
+    padding: 18px 20px 20px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.internship-info h3 {
+    font-size: 17px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 10px 0 12px;
     line-height: 1.4;
 }
 
-.course-meta {
+.internship-meta {
     display: flex;
-    gap: 12px;
-    margin-bottom: 16px;
+    gap: 8px;
     align-items: center;
+    flex-wrap: wrap;
 }
 
 .badge {
@@ -466,20 +519,77 @@
     text-transform: capitalize;
 }
 
-.duration {
-    color: #666;
-    font-size: 14px;
+
+/* Difficulty badge variants */
+
+.difficulty-badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.difficulty-beginner {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.difficulty-intermediate {
+    background: #fff8e1;
+    color: #f57f17;
+}
+
+.difficulty-advanced {
+    background: #fce4ec;
+    color: #c62828;
+}
+
+
+/* Stats row */
+
+.internship-stats-row {
+    display: flex;
+    gap: 14px;
+    margin: 14px 0;
+    flex-wrap: wrap;
+}
+
+.internship-stat {
     display: flex;
     align-items: center;
     gap: 4px;
+    font-size: 12px;
+    color: #64748b;
+    font-weight: 500;
 }
 
-.duration .material-icons {
-    font-size: 16px;
+.internship-stat .material-icons {
+    font-size: 14px;
+    color: #94a3b8;
 }
 
 
-/* Progress Bar */
+/* Progress section */
+
+.progress-section {
+    margin-bottom: 10px;
+}
+
+.progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+    font-size: 13px;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.progress-pct {
+    font-weight: 700;
+    color: #667eea;
+}
 
 .progress-bar {
     width: 100%;
@@ -487,14 +597,64 @@
     background: #e8ecef;
     border-radius: 4px;
     overflow: hidden;
-    margin-bottom: 8px;
 }
 
 .progress-fill {
     height: 100%;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 4px;
     transition: width 0.5s ease;
 }
+
+
+/* Enrolled date */
+
+.enrolled-date {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    color: #94a3b8;
+    margin: 10px 0 16px;
+    margin-top: auto;
+}
+
+.enrolled-date .material-icons {
+    font-size: 13px;
+}
+
+
+/* Continue button */
+
+.btn-continue {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-continue:hover {
+    opacity: 0.90;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4);
+}
+
+.btn-continue .material-icons {
+    font-size: 18px;
+}
+
+
+/* Legacy progress-text if used elsewhere */
 
 .progress-text {
     font-size: 14px;
@@ -536,8 +696,241 @@
 
 
 /* ============================================
-   Video List
+   Video Lessons Grid
    ============================================ */
+
+.video-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+}
+
+
+/* Card shell */
+
+.video-card {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.video-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.14);
+}
+
+
+/* Thumbnail + overlay */
+
+.video-card-thumbnail-wrapper {
+    position: relative;
+    overflow: hidden;
+}
+
+.video-card-thumbnail {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.35s ease;
+}
+
+.video-card:hover .video-card-thumbnail {
+    transform: scale(1.05);
+}
+
+
+/* Dark gradient + play button on hover */
+
+.video-play-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0) 50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.video-card:hover .video-play-overlay {
+    opacity: 1;
+}
+
+.video-play-btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.92);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s ease;
+}
+
+.video-card:hover .video-play-btn {
+    transform: scale(1.08);
+}
+
+.video-play-btn .material-icons {
+    font-size: 32px;
+    color: #667eea;
+    margin-left: 3px;
+    /* optical centering for play icon */
+}
+
+
+/* Module count chip on the thumbnail */
+
+.video-module-chip {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(4px);
+    color: white;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 9px;
+    border-radius: 20px;
+}
+
+.video-module-chip .material-icons {
+    font-size: 13px;
+}
+
+
+/* Body */
+
+.video-card-body {
+    padding: 18px 18px 20px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.video-card-badges {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+
+.video-card-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1a1a1a;
+    line-height: 1.4;
+    margin-bottom: 12px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+
+/* Stats pills */
+
+.video-card-stats {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+}
+
+.video-stat {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #64748b;
+}
+
+.video-stat .material-icons {
+    font-size: 14px;
+    color: #94a3b8;
+}
+
+
+/* Progress inside video card */
+
+.video-progress-section {
+    margin-bottom: 14px;
+}
+
+.video-progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    font-weight: 500;
+    color: #64748b;
+    margin-bottom: 6px;
+}
+
+.video-progress-pct {
+    font-weight: 700;
+    color: #667eea;
+}
+
+
+/* Watch button */
+
+.btn-watch {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    padding: 11px 16px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s ease, box-shadow 0.2s ease;
+    margin-top: auto;
+}
+
+.btn-watch:hover {
+    opacity: 0.88;
+    box-shadow: 0 4px 14px rgba(102, 126, 234, 0.4);
+}
+
+.btn-watch .material-icons {
+    font-size: 18px;
+}
+
+.btn-watch-done {
+    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    color: #1a3a2a;
+}
+
+.btn-watch-done:hover {
+    box-shadow: 0 4px 14px rgba(67, 233, 123, 0.35);
+}
+
+
+/* Complete progress fill override */
+
+.progress-fill-complete {
+    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+}
+
+
+/* Legacy list styles (kept for safety) */
 
 .video-list {
     display: flex;
@@ -545,7 +938,7 @@
     gap: 16px;
 }
 
-.video-course-section {
+.video-internship-section {
     background: white;
     padding: 24px;
     border-radius: 16px;
@@ -555,7 +948,7 @@
     align-items: center;
 }
 
-.course-title-video {
+.internship-title-video {
     font-size: 18px;
     font-weight: 600;
     color: #1a1a1a;
@@ -1082,6 +1475,9 @@
     .profile-content {
         grid-template-columns: 1fr;
     }
+    .video-cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
 @media (max-width: 768px) {
@@ -1110,17 +1506,21 @@
     .stat-info h3 {
         font-size: 28px;
     }
-    .courses-grid,
+    .internships-grid,
     .tasks-grid,
-    .certificates-grid {
+    .certificates-grid,
+    .video-cards-grid {
         grid-template-columns: 1fr;
     }
     .filter-buttons {
         flex-wrap: wrap;
     }
-    .video-course-section {
+    .video-internship-section {
         flex-direction: column;
         gap: 16px;
+    }
+    .video-card-stats {
+        gap: 10px;
     }
     .activity-item {
         flex-direction: column;

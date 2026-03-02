@@ -1,6 +1,6 @@
 require('dotenv').config();
 const mongoose = require('mongoose');
-const Course = require('../models/Course');
+const Internship = require('../models/Internship');
 const Module = require('../models/Module');
 const Task = require('../models/Task');
 const FinalProject = require('../models/FinalProject');
@@ -18,7 +18,7 @@ const connectDB = async() => {
 const seedCourses = async() => {
     try {
         // Clear existing data
-        await Course.deleteMany({});
+        await Internship.deleteMany({});
         await Module.deleteMany({});
         await Task.deleteMany({});
         await FinalProject.deleteMany({});
@@ -116,7 +116,7 @@ const seedCourses = async() => {
             }
         ];
 
-        const createdCourses = await Course.insertMany(courses);
+        const createdCourses = await Internship.insertMany(courses);
         console.log(`✅ Created ${createdCourses.length} courses`);
 
         // Create modules for Full Stack Web Development
@@ -340,7 +340,7 @@ Submit within 2 weeks of completing all modules and tasks.
         console.log('✅ Created final project for Full Stack course');
 
         console.log('\n🎉 Database seeded successfully!');
-        console.log(`\n📚 Access courses at: http://localhost:5000/api/courses`);
+        console.log(`\n📚 Access internships at: http://localhost:5000/api/internships`);
 
         process.exit(0);
     } catch (error) {

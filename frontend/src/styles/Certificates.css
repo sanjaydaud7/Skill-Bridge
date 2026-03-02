@@ -486,7 +486,7 @@
     font-family: 'Georgia', serif;
 }
 
-.course-name {
+.internship-name {
     font-size: 24px;
     font-weight: 600;
     color: #667eea;
@@ -835,7 +835,7 @@
     .student-name {
         font-size: 24px;
     }
-    .course-name {
+    .internship-name {
         font-size: 18px;
     }
     .certificate-details-grid {

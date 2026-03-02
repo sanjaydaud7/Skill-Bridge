@@ -3,17 +3,17 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
 import axios from 'axios';
-import '../styles/CourseView.css';
+import '../styles/InternshipView.css';
 import { saveAs } from 'file-saver';
 
 const API_URL = 'http://localhost:5000/api';
 
-const CourseView = () => {
+const InternshipView = () => {
   const { courseId } = useParams();
   const { token, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   
-  const [course, setCourse] = useState(null);
+  const [INTERNSHIP, setCourse] = useState(null);
   const [modules, setModules] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [progress, setProgress] = useState(null);
@@ -36,11 +36,14 @@ const CourseView = () => {
       ) {
         setLoadingCertificate(true);
         try {
-          const res = await axios.get(`${API_URL}/certificate?courseId=${courseId}`, {
+          const res = await axios.get(`${API_URL}/certificates`, {
             headers: { Authorization: `Bearer ${token}` }
           });
-          if (res.data && res.data.certificates && res.data.certificates.length > 0) {
-            setCertificate(res.data.certificates[0]);
+          // API returns { success, count, data: [...] }
+          const certs = res.data?.data || [];
+          const courseCert = certs.find(c => c.courseId?._id === courseId || c.courseId === courseId);
+          if (courseCert) {
+            setCertificate(courseCert);
           } else {
             setCertificate(null);
           }
@@ -57,7 +60,7 @@ const CourseView = () => {
   const handleDownloadCertificate = async () => {
     if (!certificate) return;
     try {
-      const res = await axios.get(`${API_URL}/certificate/${certificate._id}/download`, {
+      const res = await axios.get(`${API_URL}/certificates/${certificate._id}/download`, {
         responseType: 'blob',
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -109,8 +112,8 @@ const CourseView = () => {
       const config = { headers: { Authorization: `Bearer ${token}` } };
 
       const [courseRes, curriculumRes, tasksRes, progressRes] = await Promise.all([
-        axios.get(`${API_URL}/courses/${courseId}`, config),
-        axios.get(`${API_URL}/courses/${courseId}/curriculum`, config),
+        axios.get(`${API_URL}/internships/${courseId}`, config),
+        axios.get(`${API_URL}/internships/${courseId}/curriculum`, config),
         axios.get(`${API_URL}/tasks/${courseId}`, config),
         axios.get(`${API_URL}/progress/${courseId}`, config)
       ]);
@@ -136,9 +139,9 @@ const CourseView = () => {
         setExpandedModules({ [firstModule._id]: true });
       }
     } catch (error) {
-      console.error('Error fetching course data:', error);
+      console.error('Error fetching INTERNSHIP data:', error);
       if (error.response?.status === 403) {
-        alert('Please enroll in this course first');
+        alert('Please enroll in this internship first');
         navigate('/');
       }
     } finally {
@@ -330,19 +333,19 @@ const CourseView = () => {
         <Navbar />
         <div className="dashboard-loading">
           <div className="loading-spinner"></div>
-          <p>Loading course...</p>
+          <p>Loading internship...</p>
         </div>
       </div>
     );
   }
 
-  if (!course) {
+  if (!INTERNSHIP) {
     return (
       <div className="dashboard-layout">
         <Navbar />
         <div className="dashboard-container">
           <div className="empty-state">
-            <h2>Course not found</h2>
+            <h2>Internship not found</h2>
             <button onClick={() => navigate('/dashboard')} className="btn btn-primary">
               Back to Dashboard
             </button>
@@ -355,19 +358,19 @@ const CourseView = () => {
   return (
     <div className="dashboard-layout">
       <Navbar />
-      <div className="course-view-container">
+      <div className="iv-container">
         {/* Main Content Area */}
-        <div className="course-main">
-          {/* Course Header */}
-          <div className="course-header">
+        <div className="iv-main">
+          {/* INTERNSHIP Header */}
+          <div className="iv-header">
             <button onClick={() => navigate('/dashboard')} className="back-btn">
               ← Back to Dashboard
             </button>
-            <h1>{course.title}</h1>
-            <div className="course-meta-info">
-              <span className="badge">{course.category}</span>
-              <span className="badge badge-secondary">{course.difficulty}</span>
-              <span className="duration">{course.duration} weeks</span>
+            <h1>{INTERNSHIP.title}</h1>
+            <div className="iv-meta-info">
+              <span className="badge">{INTERNSHIP.category}</span>
+              <span className="badge badge-secondary">{INTERNSHIP.difficulty}</span>
+              <span className="duration">{INTERNSHIP.duration} weeks</span>
             </div>
             <div className="progress-section">
               <div className="progress-bar">
@@ -498,10 +501,10 @@ const CourseView = () => {
         </div>
 
         {/* Sidebar */}
-        <div className="course-sidebar">
+        <div className="iv-sidebar">
           {/* Curriculum */}
           <div className="sidebar-section">
-            <h3>📖 Course Curriculum</h3>
+            <h3>📖 Internship Curriculum</h3>
             <div className="curriculum-list">
               {modules.map((module) => (
                 <div key={module._id} className="curriculum-module-wrapper">
@@ -577,7 +580,7 @@ const CourseView = () => {
                   <div
                     key={task._id}
                     className={`task-item ${isTaskCompleted(task._id) ? 'completed' : ''}`}
-                    onClick={() => navigate(`/dashboard/course/${courseId}/tasks`)}
+                    onClick={() => navigate(`/dashboard/internship/${courseId}/tasks`)}
                   >
                     <div className="task-status">
                       {task.submissionStatus === 'approved' && '✅'}
@@ -593,7 +596,7 @@ const CourseView = () => {
                 ))
               )}
               <button 
-                onClick={() => navigate(`/dashboard/course/${courseId}/tasks`)}
+                onClick={() => navigate(`/dashboard/internship/${courseId}/tasks`)}
                 className="btn btn-sm btn-outline"
               >
                 View All Tasks
@@ -665,4 +668,4 @@ const CourseView = () => {
   );
 };
 
-export default CourseView;
+export default InternshipView;

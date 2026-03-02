@@ -1,14 +1,14 @@
 const Payment = require('../models/Payment');
-const Course = require('../models/Course');
+const Internship = require('../models/Internship');
 const Enrollment = require('../models/Enrollment');
 const Certificate = require('../models/Certificate');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 // Helper function to auto-generate certificate after payment
-const autoGenerateCertificate = async (userId, courseId, paymentId, enrollmentId) => {
+const autoGenerateCertificate = async(userId, courseId, paymentId, enrollmentId) => {
     try {
         console.log('🎓 Auto-generating certificate for:', { userId, courseId, paymentId, enrollmentId });
-        
+
         // Check if certificate already exists
         const existingCertificate = await Certificate.findOne({ userId, courseId });
         if (existingCertificate) {
@@ -17,8 +17,8 @@ const autoGenerateCertificate = async (userId, courseId, paymentId, enrollmentId
         }
 
         // Get course for details
-        const course = await Course.findById(courseId);
-        
+        const course = await Internship.findById(courseId);
+
         // Create certificate
         const certificate = await Certificate.create({
             userId,
@@ -26,7 +26,7 @@ const autoGenerateCertificate = async (userId, courseId, paymentId, enrollmentId
             enrollmentId,
             paymentId,
             grade: 'A',
-            skills: course?.skills || []
+            skills: course ? .skills || []
         });
 
         console.log('🎉 Certificate created:', certificate._id, certificate.certificateNumber);
@@ -47,8 +47,8 @@ const autoGenerateCertificate = async (userId, courseId, paymentId, enrollmentId
         console.log('🎓 Certificate auto-generated successfully:', certificate._id);
         return certificate;
     } catch (error) {
-        console.error('❌ Auto-generate certificate error:', error);
-        console.error('Error details:', error.message);
+        console.error('❌ Auto-generate certificate error:', error.message);
+        console.error('Full error stack:', error.stack);
         return null;
     }
 };
@@ -62,7 +62,7 @@ exports.createCheckoutSession = async(req, res) => {
         const userId = req.user.id;
 
         // Get course
-        const course = await Course.findById(courseId);
+        const course = await Internship.findById(courseId);
         if (!course) {
             return res.status(404).json({
                 success: false,
@@ -75,7 +75,7 @@ exports.createCheckoutSession = async(req, res) => {
         if (!enrollment) {
             return res.status(403).json({
                 success: false,
-                message: 'Not enrolled in this course'
+                message: 'Not enrolled in this internship'
             });
         }
 
@@ -89,7 +89,7 @@ exports.createCheckoutSession = async(req, res) => {
         if (existingPayment) {
             // Check if certificate already exists
             const existingCertificate = await Certificate.findOne({ userId, courseId });
-            
+
             if (existingCertificate) {
                 // Payment and certificate both exist
                 return res.status(400).json({
@@ -106,7 +106,7 @@ exports.createCheckoutSession = async(req, res) => {
                     existingPayment._id,
                     enrollment._id
                 );
-                
+
                 if (certificate) {
                     return res.status(200).json({
                         success: true,
@@ -126,7 +126,7 @@ exports.createCheckoutSession = async(req, res) => {
         const payment = await Payment.create({
             userId,
             courseId,
-            amount: course.certificatePrice,
+            amount: Internship.certificatePrice,
             currency: 'inr',
             status: 'pending'
         });
@@ -138,10 +138,10 @@ exports.createCheckoutSession = async(req, res) => {
                 price_data: {
                     currency: 'inr',
                     product_data: {
-                        name: `${course.title} - Certificate`,
+                        name: `${Internship.title} - Certificate`,
                         description: 'Course Completion Certificate',
                     },
-                    unit_amount: course.certificatePrice,
+                    unit_amount: Internship.certificatePrice,
                 },
                 quantity: 1,
             }, ],
@@ -201,15 +201,11 @@ exports.handleWebhook = async(req, res) => {
             console.log('💳 Stripe checkout completed:', session.id);
 
             // Update payment status
-            const payment = await Payment.findOneAndUpdate(
-                { stripeSessionId: session.id },
-                {
-                    status: 'completed',
-                    stripePaymentIntentId: session.payment_intent,
-                    paidAt: new Date()
-                },
-                { new: true }
-            );
+            const payment = await Payment.findOneAndUpdate({ stripeSessionId: session.id }, {
+                status: 'completed',
+                stripePaymentIntentId: session.payment_intent,
+                paidAt: new Date()
+            }, { new: true });
 
             if (!payment) {
                 console.error('❌ Payment not found for session:', session.id);
@@ -221,7 +217,7 @@ exports.handleWebhook = async(req, res) => {
                     userId: payment.userId,
                     courseId: payment.courseId
                 });
-                
+
                 if (enrollment) {
                     console.log('🎓 Generating certificate for completed payment');
                     const certificate = await autoGenerateCertificate(
@@ -230,7 +226,7 @@ exports.handleWebhook = async(req, res) => {
                         payment._id,
                         enrollment._id
                     );
-                    
+
                     if (certificate) {
                         console.log('🎉 Certificate unlocked:', certificate._id);
                     } else {
@@ -274,7 +270,7 @@ exports.bypassPayment = async(req, res) => {
         }
 
         // Get course
-        const course = await Course.findById(courseId);
+        const course = await Internship.findById(courseId);
         if (!course) {
             return res.status(404).json({
                 success: false,
@@ -287,14 +283,13 @@ exports.bypassPayment = async(req, res) => {
         if (!enrollment) {
             return res.status(403).json({
                 success: false,
-                message: 'Not enrolled in this course'
+                message: 'Not enrolled in this internship'
             });
         }
 
         // Check if certificate already exists
-        const Certificate = require('../models/Certificate');
         const existingCertificate = await Certificate.findOne({ userId, courseId });
-        
+
         if (existingCertificate) {
             return res.status(400).json({
                 success: false,
@@ -319,7 +314,7 @@ exports.bypassPayment = async(req, res) => {
                 existingPayment._id,
                 enrollment._id
             );
-            
+
             if (certificate) {
                 return res.status(200).json({
                     success: true,
@@ -341,7 +336,7 @@ exports.bypassPayment = async(req, res) => {
         const payment = await Payment.create({
             userId,
             courseId,
-            amount: course.certificatePrice,
+            amount: course.certificatePrice || 499,
             currency: 'inr',
             status: 'completed',
             bypassedForTesting: true,
@@ -368,7 +363,8 @@ exports.bypassPayment = async(req, res) => {
             console.error('❌ Failed to generate certificate after bypass');
             res.status(500).json({
                 success: false,
-                message: 'Payment bypassed but certificate generation failed'
+                message: 'Payment was recorded but certificate generation failed. Please contact support.',
+                paymentId: payment._id
             });
         }
     } catch (error) {

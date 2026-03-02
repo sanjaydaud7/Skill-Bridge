@@ -2,7 +2,7 @@ const User = require('../../models/User');
 const Enrollment = require('../../models/Enrollment');
 const Certificate = require('../../models/Certificate');
 const Payment = require('../../models/Payment');
-const Course = require('../../models/Course');
+const Internship = require('../../models/Internship');
 const TaskSubmission = require('../../models/TaskSubmission');
 const ProjectSubmission = require('../../models/ProjectSubmission');
 const AdminLog = require('../../models/AdminLog');
@@ -26,9 +26,9 @@ exports.getDashboardStats = async(req, res) => {
             createdAt: { $gte: startOfMonth }
         });
 
-        // Course statistics
-        const totalCourses = await Course.countDocuments();
-        const activeCourses = await Course.countDocuments({ isActive: true });
+        // Internship statistics
+        const totalInternships = await Internship.countDocuments();
+        const activeInternships = await Internship.countDocuments({ isActive: true });
 
         // Enrollment statistics
         const totalEnrollments = await Enrollment.countDocuments();
@@ -74,9 +74,9 @@ exports.getDashboardStats = async(req, res) => {
                     active: activeUsers,
                     newThisMonth: newUsersThisMonth
                 },
-                courses: {
-                    total: totalCourses,
-                    active: activeCourses
+                internships: {
+                    total: totalInternships,
+                    active: activeInternships
                 },
                 enrollments: {
                     total: totalEnrollments,
@@ -241,27 +241,27 @@ exports.getRevenueAnalytics = async(req, res) => {
 // @access  Private/Admin
 exports.getCourseAnalytics = async(req, res) => {
     try {
-        const courses = await Course.find();
+        const courses = await Internship.find();
 
         const courseMetrics = await Promise.all(
             courses.map(async(course) => {
-                const enrollments = await Enrollment.find({ courseId: course._id });
+                const enrollments = await Enrollment.find({ courseId: Internship._id });
                 const completed = enrollments.filter(e => e.status === 'completed').length;
                 const active = enrollments.filter(e => ['enrolled', 'in-progress'].includes(e.status)).length;
                 const avgProgress = enrollments.length > 0 ?
                     enrollments.reduce((sum, e) => sum + ((e.progress && e.progress.completionPercentage) || 0), 0) / enrollments.length :
                     0;
 
-                const certificates = await Certificate.countDocuments({ courseId: course._id });
+                const certificates = await Certificate.countDocuments({ courseId: Internship._id });
                 const revenue = await Payment.aggregate([
-                    { $match: { courseId: course._id, status: 'completed' } },
+                    { $match: { courseId: Internship._id, status: 'completed' } },
                     { $group: { _id: null, total: { $sum: '$amount' } } }
                 ]);
 
                 return {
-                    courseId: course._id,
-                    title: course.title,
-                    category: course.category,
+                    courseId: Internship._id,
+                    title: Internship.title,
+                    category: Internship.category,
                     totalEnrollments: enrollments.length,
                     activeEnrollments: active,
                     completedEnrollments: completed,

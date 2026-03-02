@@ -17,7 +17,7 @@ const {
     deleteTask,
     createOrUpdateProject,
     getCourseStats
-} = require('../../controllers/admin/adminCourseController');
+} = require('../../controllers/admin/adminInternshipController');
 const { protect, authorize } = require('../../middleware/auth');
 
 // All routes are protected and require admin role

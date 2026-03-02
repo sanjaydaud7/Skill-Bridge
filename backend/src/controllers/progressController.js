@@ -1,6 +1,6 @@
 const Enrollment = require('../models/Enrollment');
 const Module = require('../models/Module');
-const Course = require('../models/Course');
+const Internship = require('../models/Internship');
 
 // @desc    Get user's progress for a course
 // @route   GET /api/progress/:courseId
@@ -151,9 +151,9 @@ exports.getUserStats = async(req, res) => {
 
         const enrollments = await Enrollment.find({ userId });
 
-        const totalCourses = enrollments.length;
-        const completedCourses = enrollments.filter(e => e.status === 'completed').length;
-        const inProgressCourses = enrollments.filter(e => e.status === 'in-progress').length;
+        const totalInternships = enrollments.length;
+        const completedInternships = enrollments.filter(e => e.status === 'completed').length;
+        const inProgressInternships = enrollments.filter(e => e.status === 'in-progress').length;
         const certificatesEarned = enrollments.filter(e => e.certificateId).length;
 
         // Calculate average completion
@@ -164,9 +164,9 @@ exports.getUserStats = async(req, res) => {
         res.status(200).json({
             success: true,
             data: {
-                totalCourses,
-                completedCourses,
-                inProgressCourses,
+                totalInternships,
+                completedInternships,
+                inProgressInternships,
                 certificatesEarned,
                 averageCompletion: Math.round(avgCompletion)
             }
@@ -205,7 +205,7 @@ exports.bypassCompleteAll = async(req, res) => {
         // Get all modules
         const modules = await Module.find({ courseId });
         console.log('Modules found:', modules.length);
-        
+
         // Get all tasks
         const Task = require('../models/Task');
         const tasks = await Task.find({ courseId });
@@ -219,7 +219,7 @@ exports.bypassCompleteAll = async(req, res) => {
             const alreadyCompleted = enrollment.progress.videosCompleted.some(
                 v => v.moduleId.toString() === module._id.toString()
             );
-            
+
             if (!alreadyCompleted) {
                 enrollment.progress.videosCompleted.push({
                     moduleId: module._id,
@@ -236,7 +236,7 @@ exports.bypassCompleteAll = async(req, res) => {
             const alreadyCompleted = enrollment.progress.tasksCompleted.some(
                 t => t.taskId.toString() === task._id.toString()
             );
-            
+
             if (!alreadyCompleted) {
                 enrollment.progress.tasksCompleted.push({
                     taskId: task._id,
@@ -260,7 +260,7 @@ exports.bypassCompleteAll = async(req, res) => {
         enrollment.progress.completionPercentage = 100;
 
         enrollment.lastAccessedAt = new Date();
-        
+
         console.log('Saving enrollment...');
         await enrollment.save();
         console.log('Enrollment saved successfully');

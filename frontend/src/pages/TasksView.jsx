@@ -42,7 +42,7 @@ const TasksView = () => {
     } catch (error) {
       console.error('Error fetching tasks:', error);
       if (error.response?.status === 403) {
-        alert('Please enroll in this course first');
+        alert('Please enroll in this internship first');
         navigate('/dashboard');
       }
     } finally {
@@ -163,10 +163,10 @@ const TasksView = () => {
       <Navbar />
       <div className="tasks-container">
         <div className="tasks-header">
-          <button onClick={() => navigate(`/dashboard/course/${courseId}`)} className="back-btn">
-            ← Back to Course
+          <button onClick={() => navigate(`/dashboard/internship/${courseId}`)} className="back-btn">
+            ← Back to Internship
           </button>
-          <h1>📝 Course Tasks</h1>
+          <h1>📝 Internship Tasks</h1>
           <p className="subtitle">Complete these tasks to demonstrate your learning</p>
         </div>
 

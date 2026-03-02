@@ -98,11 +98,11 @@ const AdminDashboard = () => {
           />
           <StatsCard
             title="Active Internships"
-            value={stats?.courses?.active || 0}
+            value={stats?.internships?.active || 0}
             icon="library_books"
             color="green"
             trend="up"
-            trendValue={`${stats?.courses?.total || 0} total`}
+            trendValue={`${stats?.internships?.total || 0} total`}
           />
           <StatsCard
             title="Pending Reviews"
@@ -141,7 +141,7 @@ const AdminDashboard = () => {
           <div className="stat-item">
             <span className="material-icons">card_membership</span>
             <div>
-              <div className="stat-value">{stats?.certificates?.issued || 0}</div>
+              <div className="stat-value">{stats?.certificates?.total || 0}</div>
               <div className="stat-label">Certificates Issued</div>
             </div>
           </div>
@@ -190,7 +190,7 @@ const AdminDashboard = () => {
         <div className="quick-actions">
           <h2>Quick Actions</h2>
           <div className="action-buttons">
-            <a href="/admin/courses" className="action-btn">
+            <a href="/admin/internships" className="action-btn">
               <span className="material-icons">add</span>
               Create Internship
             </a>

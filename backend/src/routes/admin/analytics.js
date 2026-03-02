@@ -18,7 +18,7 @@ router.use(authorize('admin'));
 router.get('/dashboard', getDashboardStats);
 router.get('/enrollment-trends', getEnrollmentTrends);
 router.get('/revenue', getRevenueAnalytics);
-router.get('/courses', getCourseAnalytics);
+router.get('/internships', getCourseAnalytics);
 router.get('/students', getStudentAnalytics);
 router.get('/submissions', getSubmissionAnalytics);
 

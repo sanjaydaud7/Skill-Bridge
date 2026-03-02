@@ -23,7 +23,7 @@ function HomePage() {
   const fetchInternships = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API_URL}/courses`);
+      const response = await axios.get(`${API_URL}/internships`);
       if (response.data.success) {
         setInternships(response.data.data);
         setFilteredInternships(response.data.data);

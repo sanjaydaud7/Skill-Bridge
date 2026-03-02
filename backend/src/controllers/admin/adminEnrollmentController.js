@@ -1,6 +1,6 @@
 const Enrollment = require('../../models/Enrollment');
 const User = require('../../models/User');
-const Course = require('../../models/Course');
+const Internship = require('../../models/Internship');
 const AdminLog = require('../../models/AdminLog');
 
 // @desc    Get all enrollments
@@ -164,7 +164,7 @@ exports.manualEnrollment = async(req, res) => {
         }
 
         // Check if course exists
-        const course = await Course.findById(courseId);
+        const course = await Internship.findById(courseId);
         if (!course) {
             return res.status(404).json({
                 success: false,
@@ -195,8 +195,8 @@ exports.manualEnrollment = async(req, res) => {
         });
 
         // Update course enrollment count
-        course.enrollmentCount += 1;
-        await course.save();
+        Internship.enrollmentCount += 1;
+        await Internship.save();
 
         // Log action
         await AdminLog.createLog({
@@ -204,7 +204,7 @@ exports.manualEnrollment = async(req, res) => {
             action: 'enroll',
             targetModel: 'Enrollment',
             targetId: enrollment._id,
-            description: `Manually enrolled ${user.name} in ${course.title}`,
+            description: `Manually enrolled ${user.name} in ${Internship.title}`,
             ipAddress: req.ip,
             userAgent: req.get('user-agent')
         });
@@ -245,10 +245,10 @@ exports.unenrollStudent = async(req, res) => {
         }
 
         // Update course enrollment count
-        const course = await Course.findById(enrollment.courseId._id);
-        if (course && course.enrollmentCount > 0) {
-            course.enrollmentCount -= 1;
-            await course.save();
+        const course = await Internship.findById(enrollment.courseId._id);
+        if (course && Internship.enrollmentCount > 0) {
+            Internship.enrollmentCount -= 1;
+            await Internship.save();
         }
 
         const studentName = enrollment.userId.name;

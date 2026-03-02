@@ -8,7 +8,7 @@ const AdminEnrollments = () => {
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
     status: '',
-    course: '',
+    internship: '',
     search: ''
   });
   const [page, setPage] = useState(1);
@@ -39,8 +39,8 @@ const AdminEnrollments = () => {
         headers: { Authorization: `Bearer ${token}` }
       });
       
-      setEnrollments(response.data.data?.enrollments || []);
-      setTotalPages(response.data.data?.pages || 1);
+      setEnrollments(response.data.data || []);
+      setTotalPages(response.data.pagination?.pages || 1);
     } catch (err) {
       console.error('Fetch enrollments error:', err);
     } finally {
@@ -169,24 +169,24 @@ const AdminEnrollments = () => {
                       <td>
                         <div className="student-info">
                           <div className="student-avatar">
-                            {enrollment.user?.name?.[0]?.toUpperCase() || 'S'}
+                            {enrollment.userId?.name?.[0]?.toUpperCase() || 'S'}
                           </div>
                           <div>
-                            <div className="student-name">{enrollment.user?.name}</div>
-                            <div className="student-email">{enrollment.user?.email}</div>
+                            <div className="student-name">{enrollment.userId?.name}</div>
+                            <div className="student-email">{enrollment.userId?.email}</div>
                           </div>
                         </div>
                       </td>
-                      <td>{enrollment.course?.title}</td>
+                      <td>{enrollment.courseId?.title}</td>
                       <td>
                         <div className="progress-bar">
                           <div 
                             className="progress-fill" 
-                            style={{ width: `${enrollment.completionPercentage || 0}%` }}
+                            style={{ width: `${enrollment.progress?.completionPercentage || 0}%` }}
                           ></div>
                         </div>
                         <span className="progress-text">
-                          {enrollment.completionPercentage?.toFixed(1) || 0}%
+                          {(enrollment.progress?.completionPercentage || 0).toFixed(1)}%
                         </span>
                       </td>
                       <td>

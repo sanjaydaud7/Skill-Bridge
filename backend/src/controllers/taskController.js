@@ -19,7 +19,7 @@ exports.getCourseTasks = async(req, res) => {
         if (!enrollment) {
             return res.status(403).json({
                 success: false,
-                message: 'Not enrolled in this course'
+                message: 'Not enrolled in this internship'
             });
         }
 
@@ -73,7 +73,7 @@ exports.getTaskById = async(req, res) => {
         if (!enrollment) {
             return res.status(403).json({
                 success: false,
-                message: 'Not enrolled in this course'
+                message: 'Not enrolled in this internship'
             });
         }
 
@@ -121,7 +121,7 @@ exports.submitTask = async(req, res) => {
         if (!enrollment) {
             return res.status(403).json({
                 success: false,
-                message: 'Not enrolled in this course'
+                message: 'Not enrolled in this internship'
             });
         }
 

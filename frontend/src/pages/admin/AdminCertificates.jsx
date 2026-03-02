@@ -34,8 +34,8 @@ const AdminCertificates = () => {
         headers: { Authorization: `Bearer ${token}` }
       });
       
-      setCertificates(response.data.data?.certificates || []);
-      setTotalPages(response.data.data?.pages || 1);
+      setCertificates(response.data.data || []);
+      setTotalPages(response.data.pagination?.pages || 1);
     } catch (err) {
       console.error('Fetch certificates error:', err);
     } finally {
@@ -130,18 +130,18 @@ const AdminCertificates = () => {
           <>
             <div className="certificates-grid">
               {certificates && certificates.length > 0 ? certificates.map((cert) => (
-                <div key={cert._id} className={`certificate-card ${!cert.isActive ? 'revoked' : ''}`}>
+                <div key={cert._id} className={`certificate-card ${!cert.isValid ? 'revoked' : ''}`}>
                   <div className="certificate-header">
                     <span className="material-icons">card_membership</span>
-                    <span className={`status-badge ${cert.isActive ? 'active' : 'revoked'}`}>
-                      {cert.isActive ? 'Active' : 'Revoked'}
+                    <span className={`status-badge ${cert.isValid ? 'active' : 'revoked'}`}>
+                      {cert.isValid ? 'Active' : 'Revoked'}
                     </span>
                   </div>
 
                   <div className="certificate-body">
                     <div className="cert-number">{cert.certificateNumber}</div>
-                    <div className="student-name">{cert.user?.name}</div>
-                    <div className="course-title">{cert.course?.title}</div>
+                    <div className="student-name">{cert.userId?.name}</div>
+                    <div className="internship-title">{cert.courseId?.title}</div>
                     
                     <div className="cert-details">
                       <div className="cert-detail-item">
@@ -150,11 +150,11 @@ const AdminCertificates = () => {
                       </div>
                       <div className="cert-detail-item">
                         <span className="material-icons">calendar_today</span>
-                        <span>{new Date(cert.issueDate).toLocaleDateString()}</span>
+                        <span>{new Date(cert.issuedAt).toLocaleDateString()}</span>
                       </div>
                     </div>
 
-                    {!cert.isActive && cert.revocationReason && (
+                    {!cert.isValid && cert.revocationReason && (
                       <div className="revocation-reason">
                         <strong>Revoked:</strong> {cert.revocationReason}
                       </div>
@@ -162,7 +162,7 @@ const AdminCertificates = () => {
                   </div>
 
                   <div className="certificate-footer">
-                    {cert.isActive ? (
+                    {cert.isValid ? (
                       <button
                         className="btn-action revoke"
                         onClick={() => handleRevoke(cert._id)}

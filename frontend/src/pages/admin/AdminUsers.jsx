@@ -35,8 +35,8 @@ const AdminUsers = () => {
         headers: { Authorization: `Bearer ${token}` }
       });
       
-      setUsers(response.data.data?.users || []);
-      setTotalPages(response.data.data?.pages || 1);
+      setUsers(response.data.data || []);
+      setTotalPages(response.data.pagination?.pages || 1);
     } catch (err) {
       console.error('Fetch users error:', err);
     } finally {

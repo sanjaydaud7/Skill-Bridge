@@ -29,7 +29,7 @@ app.get('/', (req, res) => {
 
 // Routes
 app.use('/api/auth', require('./routes/auth'));
-app.use('/api/courses', require('./routes/course'));
+app.use('/api/internships', require('./routes/internship'));
 app.use('/api/progress', require('./routes/progress'));
 app.use('/api/tasks', require('./routes/task'));
 app.use('/api/projects', require('./routes/project'));
@@ -37,7 +37,7 @@ app.use('/api/certificates', require('./routes/certificate'));
 app.use('/api/payments', require('./routes/payment'));
 
 // Admin Routes
-app.use('/api/admin/courses', require('./routes/admin/courses'));
+app.use('/api/admin/internships', require('./routes/admin/internships'));
 app.use('/api/admin/submissions', require('./routes/admin/submissions'));
 app.use('/api/admin/enrollments', require('./routes/admin/enrollments'));
 app.use('/api/admin/users', require('./routes/admin/users'));

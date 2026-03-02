@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdminLayout from '../../components/admin/AdminLayout';
 import api from '../../config/api';
-import '../../styles/AdminCourses.css';
+import '../../styles/AdminInternships.css';
 
-const AdminCourses = () => {
-  const [courses, setCourses] = useState([]);
+const AdminInternships = () => {
+  const [internships, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [search, setSearch] = useState('');
@@ -26,7 +26,7 @@ const AdminCourses = () => {
     difficulty: 'beginner',
     duration: 8,
     thumbnail: '',
-    price: 0,
+    certificatePrice: 49900,
     skills: '',
     learningOutcomes: '',
     prerequisites: ''
@@ -57,17 +57,17 @@ const AdminCourses = () => {
       if (filters.level) params.append('difficulty', filters.level);
       if (filters.status) params.append('status', filters.status);
       
-      const response = await api.get(`/admin/courses?${params}`, {
+      const response = await api.get(`/admin/internships?${params}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
-      // Backend returns: { success, data: [...courses], pagination: { total, page, pages } }
+      // Backend returns: { success, data: [...INTERNSHIPS], pagination: { total, page, pages } }
       setCourses(response.data.data || []);
       setTotalPages(response.data.pagination?.pages || 1);
       setError(null);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to load internships');
-      console.error('Fetch courses error:', err);
+      console.error('Fetch INTERNSHIPS error:', err);
       setCourses([]);
     } finally {
       setLoading(false);
@@ -79,7 +79,7 @@ const AdminCourses = () => {
     
     try {
       const token = localStorage.getItem('token');
-      await api.delete(`/admin/courses/${courseId}`, {
+      await api.delete(`/admin/internships/${courseId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchCourses();
@@ -91,7 +91,7 @@ const AdminCourses = () => {
   const handleToggleStatus = async (courseId, currentStatus) => {
     try {
       const token = localStorage.getItem('token');
-      await api.put(`/admin/courses/${courseId}/status`, {}, {
+      await api.put(`/admin/internships/${courseId}/status`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchCourses();
@@ -105,7 +105,7 @@ const AdminCourses = () => {
     
     try {
       const token = localStorage.getItem('token');
-      await api.post(`/admin/courses/${courseId}/duplicate`, {}, {
+      await api.post(`/admin/internships/${courseId}/duplicate`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchCourses();
@@ -117,7 +117,7 @@ const AdminCourses = () => {
   const handleEdit = async (courseId) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await api.get(`/admin/courses/${courseId}`, {
+      const response = await api.get(`/admin/internships/${courseId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -154,7 +154,7 @@ const AdminCourses = () => {
         setShowEditModal(true);
       }
     } catch (err) {
-      console.error('Error fetching course details:', err);
+      console.error('Error fetching INTERNSHIP details:', err);
       alert(err.response?.data?.message || 'Failed to load internship details');
     }
   };
@@ -226,26 +226,44 @@ const AdminCourses = () => {
   };
 
   const handleSaveCurriculum = async () => {
+    // Validate required fields before sending
+    for (let i = 0; i < weeks.length; i++) {
+      const week = weeks[i];
+      if (!week.title?.trim()) {
+        alert(`Week ${i + 1} must have a title.`);
+        return;
+      }
+      for (let j = 0; j < week.videos.length; j++) {
+        const v = week.videos[j];
+        if (!v.title?.trim() || !v.videoUrl?.trim()) {
+          alert(`Week ${i + 1} — Video ${j + 1} is missing a title or URL. Please fill in all fields or remove incomplete videos before saving.`);
+          return;
+        }
+      }
+    }
+
     try {
       setSaving(true);
       const token = localStorage.getItem('token');
       
-      // Prepare modules data
+      // Prepare modules data — filter out any incomplete videos as a safety net
       const modulesData = weeks.map((week, idx) => ({
         moduleNumber: idx + 1,
-        title: week.title || `Week ${week.weekNumber}`,
+        title: week.title.trim(),
         description: `Week ${week.weekNumber} content`,
         order: idx + 1,
-        videos: week.videos.map(video => ({
-          title: video.title,
-          videoUrl: video.videoUrl,
-          duration: parseInt(video.duration) || 0,
-          description: video.description
-        }))
+        videos: week.videos
+          .filter(video => video.title?.trim() && video.videoUrl?.trim())
+          .map(video => ({
+            title: video.title.trim(),
+            videoUrl: video.videoUrl.trim(),
+            duration: parseInt(video.duration) || 0,
+            description: video.description || ''
+          }))
       }));
       
-      // Update course modules
-      await api.put(`/admin/courses/${editingCourse._id}/modules`, 
+      // Update INTERNSHIP modules
+      await api.put(`/admin/internships/${editingCourse._id}/modules`, 
         { modules: modulesData },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -275,13 +293,13 @@ const AdminCourses = () => {
         learningOutcomes: createData.learningOutcomes.split('\n').map(s => s.trim()).filter(Boolean),
         prerequisites: createData.prerequisites.split('\n').map(s => s.trim()).filter(Boolean),
         duration: parseInt(createData.duration),
-        price: parseFloat(createData.price),
+        certificatePrice: parseInt(createData.certificatePrice) || 0,
         totalModules: 0,
         totalTasks: 0,
         isActive: true
       };
       
-      await api.post('/admin/courses', formData, {
+      await api.post('/admin/internships', formData, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -295,7 +313,7 @@ const AdminCourses = () => {
         difficulty: 'beginner',
         duration: 8,
         thumbnail: '',
-        price: 0,
+        certificatePrice: 49900,
         skills: '',
         learningOutcomes: '',
         prerequisites: ''
@@ -309,7 +327,7 @@ const AdminCourses = () => {
     }
   };
 
-  if (loading && courses.length === 0) {
+  if (loading && internships.length === 0) {
     return (
       <AdminLayout>
         <div className="admin-loading">
@@ -322,8 +340,8 @@ const AdminCourses = () => {
 
   return (
     <AdminLayout>
-      <div className="admin-courses">
-        <div className="courses-header">
+      <div className="admin-internships">
+        <div className="internships-header">
           <div>
             <h1>Internship Management</h1>
             <p>Manage all internships, modules, and tasks</p>
@@ -338,7 +356,7 @@ const AdminCourses = () => {
         </div>
 
         {/* Filters */}
-        <div className="courses-filters">
+        <div className="internships-filters">
           <div className="search-box">
             <span className="material-icons">search</span>
             <input
@@ -380,7 +398,7 @@ const AdminCourses = () => {
           </select>
         </div>
 
-        {/* Courses Table */}
+        {/* INTERNSHIPS Table */}
         {error ? (
           <div className="error-message">
             <span className="material-icons">error_outline</span>
@@ -388,7 +406,7 @@ const AdminCourses = () => {
           </div>
         ) : (
           <>
-            <div className="courses-table">
+            <div className="internships-table">
               <table>
                 <thead>
                   <tr>
@@ -402,65 +420,65 @@ const AdminCourses = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {courses && courses.length > 0 ? courses.map((course) => (
-                    <tr key={course._id}>
+                  {internships && internships.length > 0 ? internships.map((internship) => (
+                    <tr key={internship._id}>
                       <td>
-                        <div className="course-info">
+                        <div className="internship-info">
                           <img 
-                            src={course.thumbnail || 'https://via.placeholder.com/80x60?text=No+Image'} 
-                            alt={course.title}
+                            src={internship.thumbnail || 'https://via.placeholder.com/80x60?text=No+Image'} 
+                            alt={internship.title}
                             onError={(e) => e.target.src = 'https://via.placeholder.com/80x60?text=No+Image'}
                           />
                           <div>
-                            <div className="course-title">{course.title}</div>
-                            <div className="course-price">₹{course.price || 0}</div>
+                            <div className="internship-title">{internship.title}</div>
+                            <div className="internship-price">₹{internship.certificatePrice || 0}</div>
                           </div>
                         </div>
                       </td>
                       <td>
-                        {course.category?.charAt(0).toUpperCase() + course.category?.slice(1).replace('-', ' ') || 'N/A'}
+                        {internship.category?.charAt(0).toUpperCase() + internship.category?.slice(1).replace('-', ' ') || 'N/A'}
                       </td>
                       <td>
-                        <span className={`level-badge level-${(course.difficulty || course.level || 'beginner').toLowerCase()}`}>
-                          {(course.difficulty || course.level || 'Beginner').charAt(0).toUpperCase() + 
-                           (course.difficulty || course.level || 'Beginner').slice(1)}
+                        <span className={`level-badge level-${(internship.difficulty || internship.level || 'beginner').toLowerCase()}`}>
+                          {(internship.difficulty || internship.level || 'Beginner').charAt(0).toUpperCase() + 
+                           (internship.difficulty || internship.level || 'Beginner').slice(1)}
                         </span>
                       </td>
-                      <td>{course.enrollmentCount || 0}</td>
-                      <td>{course.totalModules || 0}</td>
+                      <td>{internship.enrollmentCount || 0}</td>
+                      <td>{internship.totalModules || 0}</td>
                       <td>
-                        <span className={`status-badge ${course.isActive ? 'active' : 'inactive'}`}>
-                          {course.isActive ? 'Active' : 'Inactive'}
+                        <span className={`status-badge ${internship.isActive ? 'active' : 'inactive'}`}>
+                          {internship.isActive ? 'Active' : 'Inactive'}
                         </span>
                       </td>
                       <td>
                         <div className="action-buttons">
                           <button
                             className="btn-icon"
-                            onClick={() => handleEdit(course._id)}
+                            onClick={() => handleEdit(internship._id)}
                             title="Edit"
                           >
                             <span className="material-icons">edit</span>
                           </button>
                           <button
                             className="btn-icon"
-                            onClick={() => handleDuplicate(course._id)}
+                            onClick={() => handleDuplicate(internship._id)}
                             title="Duplicate"
                           >
                             <span className="material-icons">content_copy</span>
                           </button>
                           <button
                             className="btn-icon"
-                            onClick={() => handleToggleStatus(course._id, course.isActive)}
-                            title={course.isActive ? 'Deactivate' : 'Activate'}
+                            onClick={() => handleToggleStatus(internship._id, internship.isActive)}
+                            title={internship.isActive ? 'Deactivate' : 'Activate'}
                           >
                             <span className="material-icons">
-                              {course.isActive ? 'visibility_off' : 'visibility'}
+                              {internship.isActive ? 'visibility_off' : 'visibility'}
                             </span>
                           </button>
                           <button
                             className="btn-icon delete"
-                            onClick={() => handleDelete(course._id)}
+                            onClick={() => handleDelete(internship._id)}
                             title="Delete"
                           >
                             <span className="material-icons">delete</span>
@@ -472,7 +490,7 @@ const AdminCourses = () => {
                 </tbody>
               </table>
 
-              {(!courses || courses.length === 0) && !loading && (
+              {(!internships || internships.length === 0) && !loading && (
                 <div className="empty-state">
                   <span className="material-icons">school</span>
                   <p>No internships found</p>
@@ -609,11 +627,11 @@ const AdminCourses = () => {
                 </div>
 
                 <div className="form-group">
-                  <label>Price (₹) *</label>
+                  <label>Certificate Price (₹) *</label>
                   <input
                     type="number"
-                    value={createData.price}
-                    onChange={(e) => setCreateData({...createData, price: e.target.value})}
+                    value={createData.certificatePrice}
+                    onChange={(e) => setCreateData({...createData, certificatePrice: e.target.value})}
                     min="0"
                     step="0.01"
                     required
@@ -863,4 +881,4 @@ const AdminCourses = () => {
   );
 };
 
-export default AdminCourses;
+export default AdminInternships;

@@ -8,7 +8,7 @@ const AdminPayments = () => {
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
     status: '',
-    course: '',
+    INTERNSHIP: '',
     startDate: '',
     endDate: ''
   });
@@ -40,8 +40,8 @@ const AdminPayments = () => {
         headers: { Authorization: `Bearer ${token}` }
       });
       
-      setPayments(response.data.data?.payments || []);
-      setTotalPages(response.data.data?.pages || 1);
+      setPayments(response.data.data || []);
+      setTotalPages(response.data.pagination?.pages || 1);
     } catch (err) {
       console.error('Fetch payments error:', err);
     } finally {
@@ -154,11 +154,11 @@ const AdminPayments = () => {
                     <tr key={payment._id}>
                       <td>
                         <div className="user-info">
-                          <div>{payment.user?.name}</div>
-                          <div className="user-email">{payment.user?.email}</div>
+                          <div>{payment.userId?.name}</div>
+                          <div className="user-email">{payment.userId?.email}</div>
                         </div>
                       </td>
-                      <td>{payment.course?.title}</td>
+                      <td>{payment.courseId?.title}</td>
                       <td>
                         <strong className="amount">₹{payment.amount}</strong>
                       </td>
@@ -251,11 +251,11 @@ const AdminPayments = () => {
                   <h3>Payment Details</h3>
                   <div className="info-row">
                     <span>User:</span>
-                    <strong>{selectedPayment.user?.name}</strong>
+                    <strong>{selectedPayment.userId?.name}</strong>
                   </div>
                   <div className="info-row">
                     <span>Internship:</span>
-                    <strong>{selectedPayment.course?.title}</strong>
+                    <strong>{selectedPayment.courseId?.title}</strong>
                   </div>
                   <div className="info-row">
                     <span>Original Amount:</span>

@@ -23,7 +23,7 @@ const DashboardOverview = ({ stats, enrolledCourses, navigate }) => {
             <span className="material-icons">school</span>
           </div>
           <div className="stat-info">
-            <h3>{stats?.totalCourses || 0}</h3>
+            <h3>{stats?.totalInternships || 0}</h3>
             <p>Total Internships</p>
           </div>
         </div>
@@ -32,7 +32,7 @@ const DashboardOverview = ({ stats, enrolledCourses, navigate }) => {
             <span className="material-icons">trending_up</span>
           </div>
           <div className="stat-info">
-            <h3>{stats?.inProgressCourses || 0}</h3>
+            <h3>{stats?.inProgressInternships || 0}</h3>
             <p>In Progress</p>
           </div>
         </div>
@@ -41,7 +41,7 @@ const DashboardOverview = ({ stats, enrolledCourses, navigate }) => {
             <span className="material-icons">check_circle</span>
           </div>
           <div className="stat-info">
-            <h3>{stats?.completedCourses || 0}</h3>
+            <h3>{stats?.completedInternships || 0}</h3>
             <p>Completed</p>
           </div>
         </div>
@@ -64,11 +64,11 @@ const DashboardOverview = ({ stats, enrolledCourses, navigate }) => {
             <div key={enrollment._id} className="activity-item">
               <span className="material-icons">play_circle</span>
               <div className="activity-details">
-                <p className="activity-title">{enrollment.courseId?.title || 'Untitled Course'}</p>
+                <p className="activity-title">{enrollment.courseId?.title || 'Untitled Internship'}</p>
                 <p className="activity-time">Last accessed: {new Date(enrollment.lastAccessed || enrollment.enrolledAt).toLocaleDateString()}</p>
               </div>
               <button
-                onClick={() => navigate(`/dashboard/course/${enrollment.courseId?._id}`)}
+                onClick={() => navigate(`/dashboard/internship/${enrollment.courseId?._id}`)}
                 className="btn-activity"
               >
                 Continue
@@ -128,40 +128,84 @@ const MyInternships = ({ enrolledCourses, navigate }) => {
           </button>
         </div>
       ) : (
-        <div className="courses-grid">
-          {filteredCourses.map((enrollment) => (
-            <div key={enrollment._id} className="course-card">
-              <img
-                src={enrollment.courseId?.thumbnail || 'https://via.placeholder.com/300x200?text=No+Image'}
-                alt={enrollment.courseId?.title || 'Course'}
-                className="course-thumbnail"
-                onError={(e) => (e.target.src = 'https://via.placeholder.com/300x200?text=No+Image')}
-              />
-              <div className="course-info">
-                <h3>{enrollment.courseId?.title || 'Untitled Course'}</h3>
-                <div className="course-meta">
-                  <span className="badge">{enrollment.courseId?.category || 'General'}</span>
-                  <span className="duration">
-                    <span className="material-icons">schedule</span>
-                    {enrollment.courseId?.duration || 0} weeks
+        <div className="internships-grid">
+          {filteredCourses.map((enrollment) => {
+            const pct = enrollment.progress?.completionPercentage || 0;
+            const isCompleted = pct === 100;
+            const difficulty = enrollment.courseId?.difficulty || 'beginner';
+            return (
+              <div key={enrollment._id} className="internship-card">
+                {/* Thumbnail with status overlay */}
+                <div className="internship-thumbnail-wrapper">
+                  <img
+                    src={enrollment.courseId?.thumbnail || 'https://placehold.co/400x220/667eea/white?text=Internship'}
+                    alt={enrollment.courseId?.title || 'Internship'}
+                    className="internship-thumbnail"
+                    onError={(e) => (e.target.src = 'https://placehold.co/400x220/667eea/white?text=Internship')}
+                  />
+                  <span className={`internship-status-badge ${isCompleted ? 'completed' : 'in-progress'}`}>
+                    <span className="material-icons">{isCompleted ? 'check_circle' : 'play_circle'}</span>
+                    {isCompleted ? 'Completed' : 'In Progress'}
                   </span>
                 </div>
-                <div className="progress-bar">
-                  <div
-                    className="progress-fill"
-                    style={{ width: `${enrollment.progress?.completionPercentage || 0}%` }}
-                  ></div>
+
+                <div className="internship-info">
+                  {/* Category + Difficulty badges */}
+                  <div className="internship-meta">
+                    <span className="badge">{enrollment.courseId?.category || 'General'}</span>
+                    <span className={`difficulty-badge difficulty-${difficulty}`}>{difficulty}</span>
+                  </div>
+
+                  {/* Title */}
+                  <h3>{enrollment.courseId?.title || 'Untitled Internship'}</h3>
+
+                  {/* Stats row */}
+                  <div className="internship-stats-row">
+                    <span className="internship-stat">
+                      <span className="material-icons">schedule</span>
+                      {enrollment.courseId?.duration || 0} weeks
+                    </span>
+                    <span className="internship-stat">
+                      <span className="material-icons">view_module</span>
+                      {enrollment.courseId?.totalModules || 0} modules
+                    </span>
+                    <span className="internship-stat">
+                      <span className="material-icons">task_alt</span>
+                      {enrollment.courseId?.totalTasks || 0} tasks
+                    </span>
+                  </div>
+
+                  {/* Progress */}
+                  <div className="progress-section">
+                    <div className="progress-header">
+                      <span>Progress</span>
+                      <span className="progress-pct">{pct}%</span>
+                    </div>
+                    <div className="progress-bar">
+                      <div
+                        className="progress-fill"
+                        style={{ width: `${pct}%` }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Enrolled date */}
+                  <p className="enrolled-date">
+                    <span className="material-icons">calendar_today</span>
+                    Enrolled: {new Date(enrollment.enrolledAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                  </p>
+
+                  <button
+                    onClick={() => navigate(`/dashboard/internship/${enrollment.courseId?._id}`)}
+                    className="btn-continue"
+                  >
+                    {isCompleted ? 'Review Internship' : 'Continue Internship'}
+                    <span className="material-icons">arrow_forward</span>
+                  </button>
                 </div>
-                <p className="progress-text">{enrollment.progress?.completionPercentage || 0}% Complete</p>
-                <button
-                  onClick={() => navigate(`/dashboard/course/${enrollment.courseId?._id}`)}
-                  className="btn btn-primary btn-block"
-                >
-                  Continue Learning
-                </button>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
@@ -174,29 +218,99 @@ const VideoLessons = ({ enrolledCourses, navigate }) => {
     <div className="dashboard-section">
       <div className="section-header">
         <h2>Video Lessons</h2>
-        <span className="section-subtitle">Access all your course videos</span>
+        <span className="section-subtitle">
+          {enrolledCourses.length > 0
+            ? `${enrolledCourses.length} internship${enrolledCourses.length > 1 ? 's' : ''} · ${enrolledCourses.reduce((sum, e) => sum + (e.courseId?.totalModules || 0), 0)} total modules`
+            : 'Access all your internship videos'}
+        </span>
       </div>
 
       {enrolledCourses.length === 0 ? (
         <div className="empty-state">
           <span className="material-icons empty-icon">video_library</span>
           <h3>No videos available</h3>
-          <p>Enroll in a course to access video lessons</p>
+          <p>Enroll in an internship to access video lessons</p>
         </div>
       ) : (
-        <div className="video-list">
-          {enrolledCourses.map((enrollment) => (
-            <div key={enrollment._id} className="video-course-section">
-              <h3 className="course-title-video">{enrollment.courseId?.title || 'Untitled Course'}</h3>
-              <button
-                onClick={() => navigate(`/dashboard/course/${enrollment.courseId?._id}`)}
-                className="btn btn-outline"
+        <div className="video-cards-grid">
+          {enrolledCourses.map((enrollment) => {
+            const watched = enrollment.progress?.videosCompleted?.length || 0;
+            const total   = enrollment.courseId?.totalModules || 0;
+            const pct     = total > 0 ? Math.round((watched / total) * 100) : (enrollment.progress?.completionPercentage || 0);
+            const isCompleted = pct >= 100;
+            const difficulty  = enrollment.courseId?.difficulty || 'beginner';
+
+            return (
+              <div
+                key={enrollment._id}
+                className="video-card"
+                onClick={() => navigate(`/dashboard/internship/${enrollment.courseId?._id}`)}
               >
-                <span className="material-icons">play_arrow</span>
-                View All Videos
-              </button>
-            </div>
-          ))}
+                {/* Thumbnail with play overlay */}
+                <div className="video-card-thumbnail-wrapper">
+                  <img
+                    src={enrollment.courseId?.thumbnail || 'https://placehold.co/480x270/667eea/white?text=Video+Lessons'}
+                    alt={enrollment.courseId?.title || 'Internship'}
+                    className="video-card-thumbnail"
+                    onError={(e) => (e.target.src = 'https://placehold.co/480x270/667eea/white?text=Video+Lessons')}
+                  />
+                  <div className="video-play-overlay">
+                    <div className="video-play-btn">
+                      <span className="material-icons">{isCompleted ? 'replay' : 'play_arrow'}</span>
+                    </div>
+                  </div>
+                  {/* Module count chip */}
+                  <span className="video-module-chip">
+                    <span className="material-icons">video_library</span>
+                    {total} modules
+                  </span>
+                </div>
+
+                {/* Card body */}
+                <div className="video-card-body">
+                  {/* Badges */}
+                  <div className="video-card-badges">
+                    <span className="badge">{enrollment.courseId?.category || 'General'}</span>
+                    <span className={`difficulty-badge difficulty-${difficulty}`}>{difficulty}</span>
+                  </div>
+
+                  <h3 className="video-card-title">{enrollment.courseId?.title || 'Untitled Internship'}</h3>
+
+                  {/* Stats row */}
+                  <div className="video-card-stats">
+                    <span className="video-stat">
+                      <span className="material-icons">check_circle</span>
+                      {watched} / {total} watched
+                    </span>
+                    <span className="video-stat">
+                      <span className="material-icons">schedule</span>
+                      {enrollment.courseId?.duration || 0} weeks
+                    </span>
+                  </div>
+
+                  {/* Progress bar */}
+                  <div className="video-progress-section">
+                    <div className="video-progress-header">
+                      <span>{isCompleted ? 'Completed' : 'Progress'}</span>
+                      <span className="video-progress-pct">{pct}%</span>
+                    </div>
+                    <div className="progress-bar">
+                      <div
+                        className={`progress-fill${isCompleted ? ' progress-fill-complete' : ''}`}
+                        style={{ width: `${Math.min(pct, 100)}%` }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* CTA */}
+                  <button className={`btn-watch${isCompleted ? ' btn-watch-done' : ''}`}>
+                    <span className="material-icons">{isCompleted ? 'replay' : 'play_circle'}</span>
+                    {isCompleted ? 'Rewatch' : watched > 0 ? 'Continue Watching' : 'Start Watching'}
+                  </button>
+                </div>
+              </div>
+            );
+          })}
         </div>
       )}
     </div>
@@ -242,7 +356,7 @@ const TasksAssignments = () => {
         <div className="empty-state">
           <span className="material-icons empty-icon">assignment</span>
           <h3>No tasks assigned</h3>
-          <p>Your assignments will appear here once you enroll in courses</p>
+          <p>Your assignments will appear here once you Enroll in internships</p>
         </div>
       ) : (
         <div className="tasks-grid">
@@ -347,7 +461,7 @@ const FinalProjects = () => {
       <div className="empty-state">
         <span className="material-icons empty-icon">work</span>
         <h3>No final projects yet</h3>
-        <p>Complete your courses to unlock final projects</p>
+        <p>Complete your INTERNSHIPS to unlock final projects</p>
       </div>
     </div>
   );
@@ -366,14 +480,14 @@ const ProgressTracking = ({ enrolledCourses }) => {
         <div className="empty-state">
           <span className="material-icons empty-icon">insights</span>
           <h3>No progress data</h3>
-          <p>Enroll in courses to track your progress</p>
+          <p>Enroll in internships to track your progress</p>
         </div>
       ) : (
         <div className="progress-list">
           {enrolledCourses.map((enrollment) => (
             <div key={enrollment._id} className="progress-item">
-              <div className="progress-course-info">
-                <h4>{enrollment.courseId?.title || 'Untitled Course'}</h4>
+              <div className="progress-INTERNSHIP-info">
+                <h4>{enrollment.courseId?.title || 'Untitled INTERNSHIP'}</h4>
                 <div className="progress-bar-large">
                   <div
                     className="progress-fill"
@@ -399,6 +513,7 @@ const ProgressTracking = ({ enrolledCourses }) => {
 const MyCertificates = () => {
   const [certificates, setCertificates] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [downloading, setDownloading] = useState(null);
 
   useEffect(() => {
     fetchCertificates();
@@ -419,6 +534,30 @@ const MyCertificates = () => {
     }
   };
 
+  const downloadCertificate = async (cert) => {
+    setDownloading(cert._id);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`${API_URL}/certificates/${cert._id}/download`, {
+        headers: { Authorization: `Bearer ${token}` },
+        responseType: 'blob',
+      });
+      const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `SkillBridge_Certificate_${cert.certificateNumber || cert._id}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error downloading certificate:', error);
+      alert('Failed to download certificate. Please try again.');
+    } finally {
+      setDownloading(null);
+    }
+  };
+
   if (loading) {
     return <div className="loading-section">Loading certificates...</div>;
   }
@@ -434,7 +573,7 @@ const MyCertificates = () => {
         <div className="empty-state">
           <span className="material-icons empty-icon">card_membership</span>
           <h3>No certificates yet</h3>
-          <p>Complete courses to earn certificates</p>
+          <p>Complete internships to earn certificates</p>
         </div>
       ) : (
         <div className="certificates-grid">
@@ -443,9 +582,18 @@ const MyCertificates = () => {
               <div className="certificate-icon">
                 <span className="material-icons">verified</span>
               </div>
-              <h4>{cert.courseTitle}</h4>
+              <h4>{cert.courseId?.title || 'INTERNSHIP Certificate'}</h4>
               <p>Issued on: {new Date(cert.issuedAt).toLocaleDateString()}</p>
-              <button className="btn btn-outline btn-sm">Download PDF</button>
+              {cert.certificateNumber && (
+                <p style={{ fontSize: '12px', color: '#888' }}>No: {cert.certificateNumber}</p>
+              )}
+              <button
+                className="btn btn-outline btn-sm"
+                onClick={() => downloadCertificate(cert)}
+                disabled={downloading === cert._id}
+              >
+                {downloading === cert._id ? '⏳ Downloading...' : '📥 Download PDF'}
+              </button>
             </div>
           ))}
         </div>
@@ -460,24 +608,24 @@ const ResourcesMaterials = ({ enrolledCourses }) => {
     <div className="dashboard-section">
       <div className="section-header">
         <h2>Resources & Materials</h2>
-        <span className="section-subtitle">Access course materials and resources</span>
+        <span className="section-subtitle">Access INTERNSHIP materials and resources</span>
       </div>
 
       {enrolledCourses.length === 0 ? (
         <div className="empty-state">
           <span className="material-icons empty-icon">folder</span>
           <h3>No resources available</h3>
-          <p>Enroll in courses to access learning materials</p>
+          <p>Enroll in internships to access learning materials</p>
         </div>
       ) : (
         <div className="resources-list">
           {enrolledCourses.map((enrollment) => (
             <div key={enrollment._id} className="resource-group">
-              <h4>{enrollment.courseId?.title || 'Untitled Course'}</h4>
+              <h4>{enrollment.courseId?.title || 'Untitled INTERNSHIP'}</h4>
               <div className="resource-items">
                 <div className="resource-item">
                   <span className="material-icons">description</span>
-                  <span>Course Materials</span>
+                  <span>INTERNSHIP Materials</span>
                 </div>
                 <div className="resource-item">
                   <span className="material-icons">code</span>
@@ -598,7 +746,7 @@ const StudentDashboard = () => {
 
       const [statsRes, coursesRes] = await Promise.all([
         axios.get(`${API_URL}/progress/stats`, config),
-        axios.get(`${API_URL}/courses/user/enrolled`, config),
+        axios.get(`${API_URL}/internships/user/enrolled`, config),
       ]);
 
       setStats(statsRes.data.data);

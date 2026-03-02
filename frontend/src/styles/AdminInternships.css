@@ -1,21 +1,21 @@
-.admin-courses {
+.admin-internships {
     animation: fadeIn 0.3s ease;
 }
 
-.courses-header {
+.internships-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 2rem;
 }
 
-.courses-header h1 {
+.internships-header h1 {
     margin: 0;
     font-size: 2rem;
     color: #1e293b;
 }
 
-.courses-header p {
+.internships-header p {
     margin: 0.25rem 0 0;
     color: #64748b;
 }
@@ -39,7 +39,7 @@
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
-.courses-filters {
+.internships-filters {
     display: flex;
     gap: 1rem;
     margin-bottom: 2rem;
@@ -74,7 +74,7 @@
     border-color: #3b82f6;
 }
 
-.courses-filters select {
+.internships-filters select {
     padding: 0.75rem 1rem;
     border: 1px solid #e2e8f0;
     border-radius: 8px;
@@ -85,29 +85,29 @@
     transition: border-color 0.2s ease;
 }
 
-.courses-filters select:focus {
+.internships-filters select:focus {
     outline: none;
     border-color: #3b82f6;
 }
 
-.courses-table {
+.internships-table {
     background: white;
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     overflow: hidden;
 }
 
-.courses-table table {
+.internships-table table {
     width: 100%;
     border-collapse: collapse;
 }
 
-.courses-table thead {
+.internships-table thead {
     background: #f8fafc;
     border-bottom: 2px solid #e2e8f0;
 }
 
-.courses-table th {
+.internships-table th {
     padding: 1rem 1.5rem;
     text-align: left;
     font-weight: 600;
@@ -117,35 +117,35 @@
     letter-spacing: 0.05em;
 }
 
-.courses-table td {
+.internships-table td {
     padding: 1rem 1.5rem;
     border-bottom: 1px solid #e2e8f0;
 }
 
-.courses-table tbody tr:hover {
+.internships-table tbody tr:hover {
     background: #f8fafc;
 }
 
-.course-info {
+.internship-info {
     display: flex;
     align-items: center;
     gap: 1rem;
 }
 
-.course-info img {
+.internship-info img {
     width: 60px;
     height: 60px;
     object-fit: cover;
     border-radius: 8px;
 }
 
-.course-title {
+.internship-title {
     font-weight: 600;
     color: #1e293b;
     margin-bottom: 0.25rem;
 }
 
-.course-price {
+.internship-price {
     color: #3b82f6;
     font-weight: 600;
     font-size: 0.875rem;
@@ -300,15 +300,15 @@
 }
 
 @media (max-width: 768px) {
-    .courses-header {
+    .internships-header {
         flex-direction: column;
         align-items: flex-start;
         gap: 1rem;
     }
-    .courses-table {
+    .internships-table {
         overflow-x: auto;
     }
-    .courses-table table {
+    .internships-table table {
         min-width: 800px;
     }
     .search-box {

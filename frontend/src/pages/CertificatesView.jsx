@@ -1,42 +1,3 @@
-  // Helper for beautiful certificate card
-  const renderCertificateCard = cert => (
-    <div
-      key={cert._id}
-      className="certificate-card earned"
-      style={{ cursor: 'pointer', background: 'linear-gradient(135deg, #e0eafc 0%, #f0fff4 100%)', border: '2px solid #28a745', boxShadow: '0 8px 24px rgba(40,167,69,0.08)' }}
-      onClick={() => downloadCertificate(cert._id)}
-    >
-      <div className="certificate-icon" style={{ fontSize: 72, marginBottom: 12 }}>🏅</div>
-      <div className="completion-badge">Payment Successful</div>
-      <h3 style={{ fontWeight: 700, color: '#222', marginBottom: 8 }}>{cert.courseId.title}</h3>
-      <div className="certificate-details">
-        <p className="certificate-number">
-          <span style={{ color: '#333' }}>Certificate No:</span> <strong>{cert.certificateNumber}</strong>
-        </p>
-        <p className="issue-date">
-          <span style={{ color: '#333' }}>Issued:</span> {new Date(cert.issuedAt).toLocaleDateString()}
-        </p>
-        <p className="verification">
-          <span style={{ color: '#333' }}>Verification Code:</span> <code>{cert.verificationCode}</code>
-        </p>
-      </div>
-      <div className="certificate-actions" style={{ marginTop: 16 }}>
-        <button 
-          onClick={e => { e.stopPropagation(); downloadCertificate(cert._id); }}
-          className="btn btn-primary"
-          style={{ marginRight: 8 }}
-        >
-          📥 Download PDF
-        </button>
-        <button 
-          onClick={e => { e.stopPropagation(); window.open(`${API_URL}/certificates/verify/${cert.verificationCode}`, '_blank'); }}
-          className="btn btn-outline"
-        >
-          🔍 Verify
-        </button>
-      </div>
-    </div>
-  );
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -74,7 +35,7 @@ const CertificatesView = () => {
       const config = { headers: { Authorization: `Bearer ${token}` } };
 
       const [coursesRes, certificatesRes] = await Promise.all([
-        axios.get(`${API_URL}/courses/user/enrolled`, config),
+        axios.get(`${API_URL}/internships/user/enrolled`, config),
         axios.get(`${API_URL}/certificates`, config)
       ]);
 
@@ -124,13 +85,13 @@ const CertificatesView = () => {
     }
     
     if (courseIdFromUrl && enrolledCourses.length > 0) {
-      // Find the course
+      // Find the INTERNSHIP
       const targetCourse = enrolledCourses.find(
-        course => course.courseId._id === courseIdFromUrl
+        INTERNSHIP => INTERNSHIP.courseId._id === courseIdFromUrl
       );
 
       if (targetCourse) {
-        // Highlight the course
+        // Highlight the INTERNSHIP
         setHighlightedCourseId(courseIdFromUrl);
 
         // Scroll to the certificate section after a brief delay
@@ -168,9 +129,9 @@ const CertificatesView = () => {
 
 
 
-  const handleBypassPayment = async (course) => {
-    if (!course) {
-      alert('Please select a course first');
+  const handleBypassPayment = async (INTERNSHIP) => {
+    if (!INTERNSHIP) {
+      alert('Please select a INTERNSHIP first');
       return;
     }
 
@@ -183,11 +144,11 @@ const CertificatesView = () => {
     try {
       const config = { headers: { Authorization: `Bearer ${token}` } };
       
-      console.log('Bypassing payment for course:', course.courseId._id);
+      console.log('Bypassing payment for INTERNSHIP:', INTERNSHIP.courseId._id);
       
       // Bypass payment (certificate is auto-generated)
       const response = await axios.post(
-        `${API_URL}/payments/bypass/${course.courseId._id}`,
+        `${API_URL}/payments/bypass/${INTERNSHIP.courseId._id}`,
         {},
         config
       );
@@ -224,9 +185,9 @@ const CertificatesView = () => {
     }
   };
 
-  const handleStripePayment = async (course) => {
-    if (!course) {
-      alert('Please select a course first');
+  const handleStripePayment = async (INTERNSHIP) => {
+    if (!INTERNSHIP) {
+      alert('Please select a INTERNSHIP first');
       return;
     }
 
@@ -237,7 +198,7 @@ const CertificatesView = () => {
       
       const response = await axios.post(
         `${API_URL}/payments/create-checkout`,
-        { courseId: course.courseId._id },
+        { courseId: INTERNSHIP.courseId._id },
         config
       );
 
@@ -261,7 +222,7 @@ const CertificatesView = () => {
       
       // Check if certificate already exists
       if (errorData?.certificateExists) {
-        alert('✅ Certificate already issued for this course! Refreshing...');
+        alert('✅ Certificate already issued for this INTERNSHIP! Refreshing...');
         await fetchData();
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
@@ -284,7 +245,7 @@ const CertificatesView = () => {
       );
 
       // Create download link
-      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
       const link = document.createElement('a');
       link.href = url;
       link.setAttribute('download', `SkillBridge_Certificate_${certificateId}.pdf`);
@@ -296,6 +257,46 @@ const CertificatesView = () => {
       alert('Failed to download certificate');
     }
   };
+
+  // Helper for beautiful certificate card
+  const renderCertificateCard = cert => (
+    <div
+      key={cert._id}
+      className="certificate-card earned"
+      style={{ cursor: 'pointer', background: 'linear-gradient(135deg, #e0eafc 0%, #f0fff4 100%)', border: '2px solid #28a745', boxShadow: '0 8px 24px rgba(40,167,69,0.08)' }}
+      onClick={() => downloadCertificate(cert._id)}
+    >
+      <div className="certificate-icon" style={{ fontSize: 72, marginBottom: 12 }}>🏅</div>
+      <div className="completion-badge">Payment Successful</div>
+      <h3 style={{ fontWeight: 700, color: '#222', marginBottom: 8 }}>{cert.courseId.title}</h3>
+      <div className="certificate-details">
+        <p className="certificate-number">
+          <span style={{ color: '#333' }}>Certificate No:</span> <strong>{cert.certificateNumber}</strong>
+        </p>
+        <p className="issue-date">
+          <span style={{ color: '#333' }}>Issued:</span> {new Date(cert.issuedAt).toLocaleDateString()}
+        </p>
+        <p className="verification">
+          <span style={{ color: '#333' }}>Verification Code:</span> <code>{cert.verificationCode}</code>
+        </p>
+      </div>
+      <div className="certificate-actions" style={{ marginTop: 16 }}>
+        <button 
+          onClick={e => { e.stopPropagation(); downloadCertificate(cert._id); }}
+          className="btn btn-primary"
+          style={{ marginRight: 8 }}
+        >
+          📥 Download PDF
+        </button>
+        <button 
+          onClick={e => { e.stopPropagation(); window.open(`${API_URL}/certificates/verify/${cert.verificationCode}`, '_blank'); }}
+          className="btn btn-outline"
+        >
+          🔍 Verify
+        </button>
+      </div>
+    </div>
+  );
 
   if (loading) {
     return (
@@ -309,15 +310,15 @@ const CertificatesView = () => {
     );
   }
 
-  // Separate courses into eligible and ineligible
+  // Separate INTERNSHIPS into eligible and ineligible
   let completedCourses = enrolledCourses.filter(
-    course => course.progress?.completionPercentage === 100
+    INTERNSHIP => INTERNSHIP.progress?.completionPercentage === 100
   );
   
   // Filter by courseId if provided in URL
   if (courseIdFromUrl) {
     completedCourses = completedCourses.filter(
-      course => course.courseId._id === courseIdFromUrl
+      INTERNSHIP => INTERNSHIP.courseId._id === courseIdFromUrl
     );
   }
   
@@ -326,8 +327,8 @@ const CertificatesView = () => {
   };
   
   // Filter certificates by courseId if provided
-    // Only show certificates with successful payment
-    let displayCertificates = certificates.filter(cert => cert.paymentId && cert.paymentId.status === 'completed');
+    // Show all valid certificates (paymentId is not populated, so don't filter by status)
+    let displayCertificates = [...certificates];
   let inProgressCourses = enrolledCourses.filter(c => c.progress?.completionPercentage < 100);
   
   if (courseIdFromUrl) {
@@ -335,7 +336,7 @@ const CertificatesView = () => {
       cert => cert.courseId._id === courseIdFromUrl
     );
     inProgressCourses = inProgressCourses.filter(
-      course => course.courseId._id === courseIdFromUrl
+      INTERNSHIP => INTERNSHIP.courseId._id === courseIdFromUrl
     );
   }
 
@@ -350,7 +351,7 @@ const CertificatesView = () => {
           <h1>🏆 Certificates</h1>
           <p className="subtitle">
             {courseIdFromUrl 
-              ? 'Certificate for your completed course' 
+              ? 'Certificate for your completed INTERNSHIP' 
               : 'Showcase your achievements with verified certificates'
             }
           </p>
@@ -393,16 +394,16 @@ const CertificatesView = () => {
           <div className="certificates-section">
             <h2>🎯 Available Certificates</h2>
             
-            {completedCourses.map((course) => {
-              const alreadyHasCert = hasCertificate(course.courseId._id);
+            {completedCourses.map((INTERNSHIP) => {
+              const alreadyHasCert = hasCertificate(INTERNSHIP.courseId._id);
               
               if (alreadyHasCert) return null;
 
               return (
                 <div 
-                  key={course._id} 
-                  className={`certificate-unlock-section ${highlightedCourseId === course.courseId._id ? 'highlighted' : ''}`}
-                  ref={(el) => certificateSectionRef.current[course.courseId._id] = el}
+                  key={INTERNSHIP._id} 
+                  className={`certificate-unlock-section ${highlightedCourseId === INTERNSHIP.courseId._id ? 'highlighted' : ''}`}
+                  ref={(el) => certificateSectionRef.current[INTERNSHIP.courseId._id] = el}
                 >
                   {/* Left: Certificate Preview */}
                   <div className="certificate-preview">
@@ -417,16 +418,16 @@ const CertificatesView = () => {
                         <p className="certificate-text">This is to certify that</p>
                         <h2 className="student-name">[Your Name]</h2>
                         <p className="certificate-text">has successfully completed</p>
-                        <h3 className="course-name">{course.courseId.title}</h3>
+                        <h3 className="internship-name">{INTERNSHIP.courseId.title}</h3>
                         
                         <div className="certificate-details-grid">
                           <div className="detail-item">
                             <span className="detail-label">Duration:</span>
-                            <span className="detail-value">{course.courseId.duration} weeks</span>
+                            <span className="detail-value">{INTERNSHIP.courseId.duration} weeks</span>
                           </div>
                           <div className="detail-item">
                             <span className="detail-label">Category:</span>
-                            <span className="detail-value">{course.courseId.category}</span>
+                            <span className="detail-value">{INTERNSHIP.courseId.category}</span>
                           </div>
                           <div className="detail-item">
                             <span className="detail-label">Grade:</span>
@@ -483,7 +484,7 @@ const CertificatesView = () => {
                     <div className="payment-section">
                       <div className="price-display">
                         <span className="price-label">Certificate Fee</span>
-                        <span className="price-amount">₹{course.courseId.certificatePrice}</span>
+                        <span className="price-amount">₹{INTERNSHIP.courseId.certificatePrice}</span>
                       </div>
 
                       <div className="payment-methods-list">
@@ -497,7 +498,7 @@ const CertificatesView = () => {
                             </div>
                           </div>
                           <button 
-                            onClick={() => handleBypassPayment(course)}
+                            onClick={() => handleBypassPayment(INTERNSHIP)}
                             className="btn-bypass"
                             disabled={processing}
                           >
@@ -517,11 +518,11 @@ const CertificatesView = () => {
                             </div>
                           </div>
                           <button 
-                            onClick={() => handleStripePayment(course)}
+                            onClick={() => handleStripePayment(INTERNSHIP)}
                             className="btn-stripe"
                             disabled={processing}
                           >
-                            {processing ? '⏳ Processing...' : `💳 Pay ₹${course.courseId.certificatePrice}`}
+                            {processing ? '⏳ Processing...' : `💳 Pay ₹${INTERNSHIP.courseId.certificatePrice}`}
                           </button>
                         </div>
                       </div>
@@ -545,27 +546,27 @@ const CertificatesView = () => {
           <div className="certificates-section">
             <h2>⏳ In Progress</h2>
             <div className="certificates-grid">
-              {inProgressCourses.map((course) => (
-                  <div key={course._id} className="certificate-card in-progress">
+              {inProgressCourses.map((INTERNSHIP) => (
+                  <div key={INTERNSHIP._id} className="certificate-card in-progress">
                     <div className="certificate-icon">📚</div>
-                    <h3>{course.courseId.title}</h3>
+                    <h3>{INTERNSHIP.courseId.title}</h3>
                     <div className="progress-info">
                       <div className="progress-bar">
                         <div 
                           className="progress-fill" 
-                          style={{ width: `${course.progress?.completionPercentage || 0}%` }}
+                          style={{ width: `${INTERNSHIP.progress?.completionPercentage || 0}%` }}
                         ></div>
                       </div>
-                      <p>{course.progress?.completionPercentage || 0}% Complete</p>
+                      <p>{INTERNSHIP.progress?.completionPercentage || 0}% Complete</p>
                     </div>
                     <p className="progress-message">
-                      Complete the course to unlock your certificate
+                      Complete the internship to unlock your certificate
                     </p>
                     <button 
-                      onClick={() => navigate(`/dashboard/course/${course.courseId._id}`)}
+                      onClick={() => navigate(`/dashboard/internship/${INTERNSHIP.courseId._id}`)}
                       className="btn btn-outline"
                     >
-                      Continue Learning →
+                      Continue Internship →
                     </button>
                   </div>
                 ))}
@@ -577,20 +578,20 @@ const CertificatesView = () => {
         {!courseIdFromUrl && enrolledCourses.length === 0 && (
           <div className="empty-state">
             <div className="empty-icon">🎓</div>
-            <h2>No courses enrolled yet</h2>
-            <p>Enroll in courses to earn certificates</p>
+            <h2>No internships enrolled yet</h2>
+            <p>Enroll in internships to earn certificates</p>
             <button onClick={() => navigate('/')} className="btn btn-primary">
-              Browse Courses
+              Browse Internships
             </button>
           </div>
         )}
 
-        {/* No certificate for specific course */}
+        {/* No certificate for specific INTERNSHIP */}
         {courseIdFromUrl && displayCertificates.length === 0 && completedCourses.length === 0 && inProgressCourses.length === 0 && (
           <div className="empty-state">
             <div className="empty-icon">📚</div>
-            <h2>Course not found or not completed</h2>
-            <p>Complete the course requirements to earn your certificate</p>
+            <h2>Internship not found or not completed</h2>
+            <p>complete the internship requirements to earn your certificate</p>
             <button onClick={() => navigate('/dashboard/certificates')} className="btn btn-primary">
               View All Certificates
             </button>

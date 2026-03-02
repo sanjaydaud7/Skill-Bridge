@@ -1,4 +1,4 @@
-const Course = require('../../models/Course');
+const Internship = require('../../models/Internship');
 const Module = require('../../models/Module');
 const Task = require('../../models/Task');
 const FinalProject = require('../../models/FinalProject');
@@ -6,7 +6,7 @@ const Enrollment = require('../../models/Enrollment');
 const AdminLog = require('../../models/AdminLog');
 
 // @desc    Get all courses for admin
-// @route   GET /api/admin/courses
+// @route   GET /api/admin/internships
 // @access  Private/Admin
 exports.getCourses = async(req, res) => {
     try {
@@ -25,13 +25,13 @@ exports.getCourses = async(req, res) => {
         }
 
         const skip = (page - 1) * limit;
-        const courses = await Course.find(query)
+        const courses = await Internship.find(query)
             .populate('createdBy', 'name email')
             .sort({ createdAt: -1 })
             .skip(skip)
             .limit(parseInt(limit));
 
-        const total = await Course.countDocuments(query);
+        const total = await Internship.countDocuments(query);
 
         res.json({
             success: true,
@@ -43,27 +43,27 @@ exports.getCourses = async(req, res) => {
             }
         });
     } catch (error) {
-        console.error('Error fetching courses:', error);
+        console.error('Error fetching internships:', error);
         res.status(500).json({
             success: false,
-            message: 'Error fetching courses',
+            message: 'Error fetching internships',
             error: error.message
         });
     }
 };
 
 // @desc    Get single course details for admin
-// @route   GET /api/admin/courses/:id
+// @route   GET /api/admin/internships/:id
 // @access  Private/Admin
 exports.getCourse = async(req, res) => {
     try {
-        const course = await Course.findById(req.params.id)
+        const course = await Internship.findById(req.params.id)
             .populate('createdBy', 'name email');
 
         if (!course) {
             return res.status(404).json({
                 success: false,
-                message: 'Course not found'
+                message: 'Internship not found'
             });
         }
 
@@ -87,14 +87,14 @@ exports.getCourse = async(req, res) => {
         console.error('Error fetching course:', error);
         res.status(500).json({
             success: false,
-            message: 'Error fetching course',
+            message: 'Error fetching internship',
             error: error.message
         });
     }
 };
 
 // @desc    Create new course
-// @route   POST /api/admin/courses
+// @route   POST /api/admin/internships
 // @access  Private/Admin
 exports.createCourse = async(req, res) => {
     try {
@@ -103,45 +103,45 @@ exports.createCourse = async(req, res) => {
             createdBy: req.user._id
         };
 
-        const course = await Course.create(courseData);
+        const course = await Internship.create(courseData);
 
         // Log action
         await AdminLog.createLog({
             adminId: req.user._id,
             action: 'create',
-            targetModel: 'Course',
+            targetModel: 'internship',
             targetId: course._id,
-            description: `Created course: ${course.title}`,
+            description: `Created internship: ${course.title}`,
             ipAddress: req.ip,
             userAgent: req.get('user-agent')
         });
 
         res.status(201).json({
             success: true,
-            message: 'Course created successfully',
+            message: 'Internship created successfully',
             data: course
         });
     } catch (error) {
         console.error('Error creating course:', error);
         res.status(500).json({
             success: false,
-            message: 'Error creating course',
+            message: 'Error creating internship',
             error: error.message
         });
     }
 };
 
 // @desc    Update course
-// @route   PUT /api/admin/courses/:id
+// @route   PUT /api/admin/internships/:id
 // @access  Private/Admin
 exports.updateCourse = async(req, res) => {
     try {
-        const course = await Course.findById(req.params.id);
+        const course = await Internship.findById(req.params.id);
 
         if (!course) {
             return res.status(404).json({
                 success: false,
-                message: 'Course not found'
+                message: 'Internship not found'
             });
         }
 
@@ -153,40 +153,40 @@ exports.updateCourse = async(req, res) => {
         await AdminLog.createLog({
             adminId: req.user._id,
             action: 'update',
-            targetModel: 'Course',
+            targetModel: 'internship',
             targetId: course._id,
             changes: { old: oldData, new: course.toObject() },
-            description: `Updated course: ${course.title}`,
+            description: `Updated internship: ${course.title}`,
             ipAddress: req.ip,
             userAgent: req.get('user-agent')
         });
 
         res.json({
             success: true,
-            message: 'Course updated successfully',
+            message: 'Internship updated successfully',
             data: course
         });
     } catch (error) {
         console.error('Error updating course:', error);
         res.status(500).json({
             success: false,
-            message: 'Error updating course',
+            message: 'Error updating internship',
             error: error.message
         });
     }
 };
 
 // @desc    Delete course (soft delete)
-// @route   DELETE /api/admin/courses/:id
+// @route   DELETE /api/admin/internships/:id
 // @access  Private/Admin
 exports.deleteCourse = async(req, res) => {
     try {
-        const course = await Course.findById(req.params.id);
+        const course = await Internship.findById(req.params.id);
 
         if (!course) {
             return res.status(404).json({
                 success: false,
-                message: 'Course not found'
+                message: 'Internship not found'
             });
         }
 
@@ -210,38 +210,38 @@ exports.deleteCourse = async(req, res) => {
         await AdminLog.createLog({
             adminId: req.user._id,
             action: 'delete',
-            targetModel: 'Course',
+            targetModel: 'internship',
             targetId: course._id,
-            description: `Deleted course: ${course.title}`,
+            description: `Deleted internship: ${course.title}`,
             ipAddress: req.ip,
             userAgent: req.get('user-agent')
         });
 
         res.json({
             success: true,
-            message: 'Course deleted successfully'
+            message: 'Internship deleted successfully'
         });
     } catch (error) {
         console.error('Error deleting course:', error);
         res.status(500).json({
             success: false,
-            message: 'Error deleting course',
+            message: 'Error deleting internship',
             error: error.message
         });
     }
 };
 
 // @desc    Toggle course active status
-// @route   PUT /api/admin/courses/:id/status
+// @route   PUT /api/admin/internships/:id/status
 // @access  Private/Admin
 exports.toggleCourseStatus = async(req, res) => {
     try {
-        const course = await Course.findById(req.params.id);
+        const course = await Internship.findById(req.params.id);
 
         if (!course) {
             return res.status(404).json({
                 success: false,
-                message: 'Course not found'
+                message: 'Internship not found'
             });
         }
 
@@ -252,39 +252,39 @@ exports.toggleCourseStatus = async(req, res) => {
         await AdminLog.createLog({
             adminId: req.user._id,
             action: 'status_change',
-            targetModel: 'Course',
+            targetModel: 'internship',
             targetId: course._id,
-            description: `${course.isActive ? 'Activated' : 'Deactivated'} course: ${course.title}`,
+            description: `${course.isActive ? 'Activated' : 'Deactivated'} internship: ${course.title}`,
             ipAddress: req.ip,
             userAgent: req.get('user-agent')
         });
 
         res.json({
             success: true,
-            message: `Course ${course.isActive ? 'activated' : 'deactivated'} successfully`,
+            message: `Internship ${course.isActive ? 'activated' : 'deactivated'} successfully`,
             data: course
         });
     } catch (error) {
         console.error('Error toggling course status:', error);
         res.status(500).json({
             success: false,
-            message: 'Error toggling course status',
+            message: 'Error toggling internship status',
             error: error.message
         });
     }
 };
 
 // @desc    Duplicate course
-// @route   POST /api/admin/courses/:id/duplicate
+// @route   POST /api/admin/internships/:id/duplicate
 // @access  Private/Admin
 exports.duplicateCourse = async(req, res) => {
     try {
-        const originalCourse = await Course.findById(req.params.id);
+        const originalCourse = await Internship.findById(req.params.id);
 
         if (!originalCourse) {
             return res.status(404).json({
                 success: false,
-                message: 'Course not found'
+                message: 'Internship not found'
             });
         }
 
@@ -298,7 +298,7 @@ exports.duplicateCourse = async(req, res) => {
         courseData.createdBy = req.user._id;
         courseData.enrollmentCount = 0;
 
-        const newCourse = await Course.create(courseData);
+        const newCourse = await Internship.create(courseData);
 
         // Duplicate modules
         const modules = await Module.find({ courseId: originalCourse._id });
@@ -337,7 +337,7 @@ exports.duplicateCourse = async(req, res) => {
         await AdminLog.createLog({
             adminId: req.user._id,
             action: 'create',
-            targetModel: 'Course',
+            targetModel: 'internship',
             targetId: newCourse._id,
             description: `Duplicated course: ${originalCourse.title}`,
             ipAddress: req.ip,
@@ -346,30 +346,30 @@ exports.duplicateCourse = async(req, res) => {
 
         res.status(201).json({
             success: true,
-            message: 'Course duplicated successfully',
+            message: 'Internship duplicated successfully',
             data: newCourse
         });
     } catch (error) {
         console.error('Error duplicating course:', error);
         res.status(500).json({
             success: false,
-            message: 'Error duplicating course',
+            message: 'Error duplicating internship',
             error: error.message
         });
     }
 };
 
 // @desc    Create module
-// @route   POST /api/admin/courses/:id/modules
+// @route   POST /api/admin/internships/:id/modules
 // @access  Private/Admin
 exports.createModule = async(req, res) => {
     try {
-        const course = await Course.findById(req.params.id);
+        const course = await Internship.findById(req.params.id);
 
         if (!course) {
             return res.status(404).json({
                 success: false,
-                message: 'Course not found'
+                message: 'Internship not found'
             });
         }
 
@@ -390,7 +390,7 @@ exports.createModule = async(req, res) => {
             action: 'create',
             targetModel: 'Module',
             targetId: module._id,
-            description: `Created module: ${module.title} in course: ${course.title}`,
+            description: `Created module: ${module.title} in internship: ${course.title}`,
             ipAddress: req.ip,
             userAgent: req.get('user-agent')
         });
@@ -471,7 +471,7 @@ exports.deleteModule = async(req, res) => {
         await module.deleteOne();
 
         // Update course module count
-        const course = await Course.findById(courseId);
+        const course = await Internship.findById(courseId);
         if (course) {
             course.totalModules = await Module.countDocuments({ courseId });
             await course.save();
@@ -503,16 +503,16 @@ exports.deleteModule = async(req, res) => {
 };
 
 // @desc    Bulk update/create modules for a course
-// @route   PUT /api/admin/courses/:id/modules
+// @route   PUT /api/admin/internships/:id/modules
 // @access  Private/Admin
 exports.bulkUpdateModules = async(req, res) => {
     try {
-        const course = await Course.findById(req.params.id);
+        const course = await Internship.findById(req.params.id);
 
         if (!course) {
             return res.status(404).json({
                 success: false,
-                message: 'Course not found'
+                message: 'Internship not found'
             });
         }
 
@@ -531,10 +531,18 @@ exports.bulkUpdateModules = async(req, res) => {
         // Create new modules
         const createdModules = [];
         for (let i = 0; i < modules.length; i++) {
+            const mod = modules[i];
+
+            // Sanitize: remove incomplete video entries before saving
+            const sanitizedVideos = Array.isArray(mod.videos) ?
+                mod.videos.filter(v => v && v.title && v.title.trim() && v.videoUrl && v.videoUrl.trim()) :
+                [];
+
             const moduleData = {
-                ...modules[i],
+                ...mod,
+                videos: sanitizedVideos,
                 courseId: course._id,
-                order: modules[i].order || i + 1
+                order: mod.order || i + 1
             };
             const module = await Module.create(moduleData);
             createdModules.push(module);
@@ -548,9 +556,9 @@ exports.bulkUpdateModules = async(req, res) => {
         await AdminLog.createLog({
             adminId: req.user._id,
             action: 'update',
-            targetModel: 'Course',
+            targetModel: 'internship',
             targetId: course._id,
-            description: `Updated curriculum for course: ${course.title}`,
+            description: `Updated curriculum for internship: ${course.title}`,
             ipAddress: req.ip,
             userAgent: req.get('user-agent')
         });
@@ -571,16 +579,16 @@ exports.bulkUpdateModules = async(req, res) => {
 };
 
 // @desc    Create task
-// @route   POST /api/admin/courses/:id/tasks
+// @route   POST /api/admin/internships/:id/tasks
 // @access  Private/Admin
 exports.createTask = async(req, res) => {
     try {
-        const course = await Course.findById(req.params.id);
+        const course = await Internship.findById(req.params.id);
 
         if (!course) {
             return res.status(404).json({
                 success: false,
-                message: 'Course not found'
+                message: 'Internship not found'
             });
         }
 
@@ -601,7 +609,7 @@ exports.createTask = async(req, res) => {
             action: 'create',
             targetModel: 'Task',
             targetId: task._id,
-            description: `Created task: ${task.title} in course: ${course.title}`,
+            description: `Created task: ${task.title} in internship: ${course.title}`,
             ipAddress: req.ip,
             userAgent: req.get('user-agent')
         });
@@ -682,7 +690,7 @@ exports.deleteTask = async(req, res) => {
         await task.deleteOne();
 
         // Update course task count
-        const course = await Course.findById(courseId);
+        const course = await Internship.findById(courseId);
         if (course) {
             course.totalTasks = await Task.countDocuments({ courseId });
             await course.save();
@@ -714,16 +722,16 @@ exports.deleteTask = async(req, res) => {
 };
 
 // @desc    Create or update final project
-// @route   POST /api/admin/courses/:id/project
+// @route   POST /api/admin/internships/:id/project
 // @access  Private/Admin
 exports.createOrUpdateProject = async(req, res) => {
     try {
-        const course = await Course.findById(req.params.id);
+        const course = await Internship.findById(req.params.id);
 
         if (!course) {
             return res.status(404).json({
                 success: false,
-                message: 'Course not found'
+                message: 'Internship not found'
             });
         }
 
@@ -747,7 +755,7 @@ exports.createOrUpdateProject = async(req, res) => {
             action: project.isNew ? 'create' : 'update',
             targetModel: 'FinalProject',
             targetId: project._id,
-            description: `${project.isNew ? 'Created' : 'Updated'} final project for course: ${course.title}`,
+            description: `${project.isNew ? 'Created' : 'Updated'} final project for internship: ${course.title}`,
             ipAddress: req.ip,
             userAgent: req.get('user-agent')
         });
@@ -768,16 +776,16 @@ exports.createOrUpdateProject = async(req, res) => {
 };
 
 // @desc    Get course statistics
-// @route   GET /api/admin/courses/:id/stats
+// @route   GET /api/admin/internships/:id/stats
 // @access  Private/Admin
 exports.getCourseStats = async(req, res) => {
     try {
-        const course = await Course.findById(req.params.id);
+        const course = await Internship.findById(req.params.id);
 
         if (!course) {
             return res.status(404).json({
                 success: false,
-                message: 'Course not found'
+                message: 'Internship not found'
             });
         }
 
@@ -807,7 +815,7 @@ exports.getCourseStats = async(req, res) => {
         console.error('Error fetching course stats:', error);
         res.status(500).json({
             success: false,
-            message: 'Error fetching course statistics',
+            message: 'Error fetching internship statistics',
             error: error.message
         });
     }

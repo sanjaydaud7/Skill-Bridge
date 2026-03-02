@@ -51,33 +51,33 @@ export const endpoints = {
         refreshToken: '/auth/refresh-token',
     },
 
-    // Courses
-    courses: {
-        getAll: '/courses',
-        getById: (id) => `/courses/${id}`,
-        enroll: (id) => `/courses/${id}/enroll`,
-        getEnrolled: '/courses/enrolled',
-        getCurriculum: (id) => `/courses/${id}/curriculum`,
+    // INTERNSHIPS
+    INTERNSHIPS: {
+        getAll: '/internships',
+        getById: (id) => `/internships/${id}`,
+        enroll: (id) => `/internships/${id}/enroll`,
+        getEnrolled: '/internships/enrolled',
+        getCurriculum: (id) => `/internships/${id}/curriculum`,
     },
 
     // Progress
     progress: {
-        markVideoComplete: (courseId) => `/courses/${courseId}/progress/video`,
-        getProgress: (courseId) => `/courses/${courseId}/progress`,
-        updateProgress: (courseId) => `/courses/${courseId}/progress`,
+        markVideoComplete: (courseId) => `/internships/${courseId}/progress/video`,
+        getProgress: (courseId) => `/internships/${courseId}/progress`,
+        updateProgress: (courseId) => `/internships/${courseId}/progress`,
     },
 
     // Tasks
     tasks: {
-        submit: (courseId) => `/courses/${courseId}/tasks/submit`,
-        getSubmissions: (courseId) => `/courses/${courseId}/tasks/submissions`,
-        getById: (courseId, taskId) => `/courses/${courseId}/tasks/${taskId}`,
+        submit: (courseId) => `/internships/${courseId}/tasks/submit`,
+        getSubmissions: (courseId) => `/internships/${courseId}/tasks/submissions`,
+        getById: (courseId, taskId) => `/internships/${courseId}/tasks/${taskId}`,
     },
 
     // Projects
     projects: {
-        submit: (courseId) => `/courses/${courseId}/project/submit`,
-        getSubmission: (courseId) => `/courses/${courseId}/project/submission`,
+        submit: (courseId) => `/internships/${courseId}/project/submit`,
+        getSubmission: (courseId) => `/internships/${courseId}/project/submission`,
     },
 
     // Certificates

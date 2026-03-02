@@ -1,6 +1,6 @@
 const Payment = require('../../models/Payment');
 const User = require('../../models/User');
-const Course = require('../../models/Course');
+const Internship = require('../../models/Internship');
 const AdminLog = require('../../models/AdminLog');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
@@ -261,7 +261,7 @@ exports.createManualPayment = async(req, res) => {
             });
         }
 
-        const course = await Course.findById(courseId);
+        const course = await Internship.findById(courseId);
         if (!course) {
             return res.status(404).json({
                 success: false,
@@ -287,7 +287,7 @@ exports.createManualPayment = async(req, res) => {
         const payment = await Payment.create({
             userId,
             courseId,
-            amount: amount || course.certificatePrice,
+            amount: amount || Internship.certificatePrice,
             currency: 'inr',
             status: 'completed',
             paymentMethod: paymentMethod || 'manual',
@@ -306,7 +306,7 @@ exports.createManualPayment = async(req, res) => {
             action: 'manual_payment',
             targetModel: 'Payment',
             targetId: payment._id,
-            description: `Created manual payment entry for ${user.name} - ${course.title}`,
+            description: `Created manual payment entry for ${user.name} - ${Internship.title}`,
             ipAddress: req.ip,
             userAgent: req.get('user-agent')
         });

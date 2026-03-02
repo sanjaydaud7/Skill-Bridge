@@ -15,7 +15,7 @@ exports.getProjectDetails = async(req, res) => {
         if (!enrollment) {
             return res.status(403).json({
                 success: false,
-                message: 'Not enrolled in this course'
+                message: 'Not enrolled in this internship'
             });
         }
 
@@ -23,7 +23,7 @@ exports.getProjectDetails = async(req, res) => {
         if (!project) {
             return res.status(404).json({
                 success: false,
-                message: 'Project not found for this course'
+                message: 'Project not found for this internship'
             });
         }
 
@@ -71,7 +71,7 @@ exports.submitProject = async(req, res) => {
         if (!enrollment) {
             return res.status(403).json({
                 success: false,
-                message: 'Not enrolled in this course'
+                message: 'Not enrolled in this internship'
             });
         }
 

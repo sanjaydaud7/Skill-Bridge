@@ -28,8 +28,8 @@ const AdminAnalytics = () => {
         case 'revenue':
           endpoint = '/admin/analytics/revenue';
           break;
-        case 'courses':
-          endpoint = '/admin/analytics/courses';
+        case 'internships':
+          endpoint = '/admin/analytics/internships';
           break;
         case 'students':
           endpoint = '/admin/analytics/students';
@@ -73,8 +73,8 @@ const AdminAnalytics = () => {
             Revenue
           </button>
           <button
-            className={`tab ${activeTab === 'courses' ? 'active' : ''}`}
-            onClick={() => setActiveTab('courses')}
+            className={`tab ${activeTab === 'internships' ? 'active' : ''}`}
+            onClick={() => setActiveTab('internships')}
           >
             <span className="material-icons">library_books</span>
             Internships
@@ -163,16 +163,16 @@ const AdminAnalytics = () => {
                 {analytics.topCourses && analytics.topCourses.length > 0 && (
                   <div className="analytics-section">
                     <h2>Top Revenue Internships</h2>
-                    <div className="courses-revenue-list">
-                      {analytics.topCourses.map((course, index) => (
-                        <div key={index} className="course-revenue-item">
-                          <div className="course-rank">{index + 1}</div>
-                          <div className="course-details">
-                            <div className="course-name">{course.title}</div>
-                            <div className="course-revenue">₹{course.revenue?.toLocaleString()}</div>
+                    <div className="internships-revenue-list">
+                      {analytics.topCourses.map((item, index) => (
+                        <div key={index} className="internship-revenue-item">
+                          <div className="internship-rank">{index + 1}</div>
+                          <div className="internship-details">
+                            <div className="internship-name">{item.title}</div>
+                            <div className="internship-revenue">₹{item.revenue?.toLocaleString()}</div>
                           </div>
-                          <div className="course-enrollments">
-                            {course.enrollmentCount} enrollments
+                          <div className="internship-enrollments">
+                            {item.enrollmentCount} enrollments
                           </div>
                         </div>
                       ))}
@@ -196,42 +196,42 @@ const AdminAnalytics = () => {
               </div>
             )}
 
-            {activeTab === 'courses' && analytics && (
-              <div className="courses-analytics">
+            {activeTab === 'internships' && analytics && (
+              <div className="internships-analytics">
                 {analytics.length > 0 ? (
-                  <div className="courses-analytics-list">
-                    {analytics.map((course, index) => (
-                      <div key={index} className="course-analytics-card">
-                        <div className="course-header">
-                          <h3>{course.title}</h3>
-                          <span className="course-category">{course.category}</span>
+                  <div className="internships-analytics-list">
+                    {analytics.map((item, index) => (
+                      <div key={index} className="internship-analytics-card">
+                        <div className="internship-header">
+                          <h3>{item.title}</h3>
+                          <span className="internship-category">{item.category}</span>
                         </div>
-                        <div className="course-metrics">
+                        <div className="internship-metrics">
                           <div className="metric">
                             <span className="material-icons">people</span>
                             <div>
-                              <div className="metric-value">{course.totalEnrollments}</div>
+                              <div className="metric-value">{item.totalEnrollments}</div>
                               <div className="metric-label">Enrollments</div>
                             </div>
                           </div>
                           <div className="metric">
                             <span className="material-icons">task_alt</span>
                             <div>
-                              <div className="metric-value">{course.completedEnrollments}</div>
+                              <div className="metric-value">{item.completedEnrollments}</div>
                               <div className="metric-label">Completed</div>
                             </div>
                           </div>
                           <div className="metric">
                             <span className="material-icons">payments</span>
                             <div>
-                              <div className="metric-value">₹{course.totalRevenue?.toLocaleString()}</div>
+                              <div className="metric-value">₹{item.totalRevenue?.toLocaleString()}</div>
                               <div className="metric-label">Revenue</div>
                             </div>
                           </div>
                           <div className="metric">
                             <span className="material-icons">trending_up</span>
                             <div>
-                              <div className="metric-value">{course.averageProgress?.toFixed(1)}%</div>
+                              <div className="metric-value">{item.averageProgress?.toFixed(1)}%</div>
                               <div className="metric-label">Avg Progress</div>
                             </div>
                           </div>
@@ -242,7 +242,7 @@ const AdminAnalytics = () => {
                 ) : (
                   <div className="empty-state">
                     <span className="material-icons">library_books</span>
-                    <p>No course analytics available</p>
+                    <p>No internship analytics available</p>
                   </div>
                 )}
               </div>

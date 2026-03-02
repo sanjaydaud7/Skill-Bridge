@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
 
-const courseSchema = new mongoose.Schema({
+const internshipSchema = new mongoose.Schema({
     title: {
         type: String,
-        required: [true, 'Course title is required'],
+        required: [true, 'Internship title is required'],
         trim: true,
         maxlength: [100, 'Title cannot exceed 100 characters']
     },
@@ -15,7 +15,7 @@ const courseSchema = new mongoose.Schema({
     },
     description: {
         type: String,
-        required: [true, 'Course description is required'],
+        required: [true, 'Internship description is required'],
         maxlength: [2000, 'Description cannot exceed 2000 characters']
     },
     shortDescription: {
@@ -90,8 +90,8 @@ const courseSchema = new mongoose.Schema({
 });
 
 // Create index for search
-courseSchema.index({ title: 'text', description: 'text' });
-courseSchema.index({ category: 1, difficulty: 1 });
-courseSchema.index({ isActive: 1 });
+internshipSchema.index({ title: 'text', description: 'text' });
+internshipSchema.index({ category: 1, difficulty: 1 });
+internshipSchema.index({ isActive: 1 });
 
-module.exports = mongoose.model('Course', courseSchema);
+module.exports = mongoose.model('Course', internshipSchema);

@@ -27,7 +27,7 @@ const InternshipDetail = () => {
   const fetchInternshipDetails = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API_URL}/courses/${id}`);
+      const response = await axios.get(`${API_URL}/internships/${id}`);
       if (response.data.success) {
         setInternship(response.data.data);
       }
@@ -41,7 +41,7 @@ const InternshipDetail = () => {
 
   const checkEnrollmentStatus = async () => {
     try {
-      const response = await axios.get(`${API_URL}/courses/user/enrolled`, {
+      const response = await axios.get(`${API_URL}/internships/user/enrolled`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (response.data.success) {
@@ -64,7 +64,7 @@ const InternshipDetail = () => {
     try {
       setEnrolling(true);
       const response = await axios.post(
-        `${API_URL}/courses/${id}/enroll`,
+        `${API_URL}/internships/${id}/enroll`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -82,8 +82,8 @@ const InternshipDetail = () => {
     }
   };
 
-  const handleGoToCourse = () => {
-    navigate(`/dashboard/course/${id}`);
+  const handleGoToInternship = () => {
+    navigate(`/dashboard/internship/${id}`);
   };
 
   if (loading) {
@@ -310,7 +310,7 @@ const InternshipDetail = () => {
           <div style={{ marginTop: '40px', textAlign: 'center' }}>
             {isEnrolled ? (
               <button
-                onClick={handleGoToCourse}
+                onClick={handleGoToInternship}
                 style={{
                   padding: '16px 48px',
                   background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
@@ -326,7 +326,7 @@ const InternshipDetail = () => {
                 onMouseOver={(e) => e.target.style.transform = 'translateY(-2px)'}
                 onMouseOut={(e) => e.target.style.transform = 'translateY(0)'}
               >
-                Go to Course →
+                Go to INTERNSHIP →
               </button>
             ) : (
               <button

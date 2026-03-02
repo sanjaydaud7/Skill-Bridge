@@ -1,11 +1,11 @@
-const Course = require('../models/Course');
+const Internship = require('../models/Internship');
 const Enrollment = require('../models/Enrollment');
 const Module = require('../models/Module');
 
-// @desc    Get all active courses
-// @route   GET /api/courses
+// @desc    Get all active internships
+// @route   GET /api/internships
 // @access  Public
-exports.getAllCourses = async(req, res) => {
+exports.getAllInternships = async(req, res) => {
     try {
         const { category, difficulty, search } = req.query;
 
@@ -23,55 +23,55 @@ exports.getAllCourses = async(req, res) => {
             filter.$text = { $search: search };
         }
 
-        const courses = await Course.find(filter)
+        const internships = await Internship.find(filter)
             .select('-__v')
             .sort({ createdAt: -1 });
 
         res.status(200).json({
             success: true,
-            count: courses.length,
-            data: courses
+            count: internships.length,
+            data: internships
         });
     } catch (error) {
-        console.error('Get courses error:', error);
+        console.error('Get internships error:', error);
         res.status(500).json({
             success: false,
-            message: 'Server error while fetching courses'
+            message: 'Server error while fetching internships'
         });
     }
 };
 
-// @desc    Get single course by ID
-// @route   GET /api/courses/:id
+// @desc    Get single internship by ID
+// @route   GET /api/internships/:id
 // @access  Public
-exports.getCourseById = async(req, res) => {
+exports.getInternshipById = async(req, res) => {
     try {
-        const course = await Course.findById(req.params.id);
+        const internship = await Internship.findById(req.params.id);
 
-        if (!course) {
+        if (!internship) {
             return res.status(404).json({
                 success: false,
-                message: 'Course not found'
+                message: 'Internship not found'
             });
         }
 
         res.status(200).json({
             success: true,
-            data: course
+            data: internship
         });
     } catch (error) {
-        console.error('Get course error:', error);
+        console.error('Get internship error:', error);
         res.status(500).json({
             success: false,
-            message: 'Server error while fetching course'
+            message: 'Server error while fetching internship'
         });
     }
 };
 
-// @desc    Get course curriculum (modules)
-// @route   GET /api/courses/:id/curriculum
+// @desc    Get internship curriculum (modules)
+// @route   GET /api/internships/:id/curriculum
 // @access  Public (preview modules) / Private (all modules)
-exports.getCourseCurriculum = async(req, res) => {
+exports.getInternshipCurriculum = async(req, res) => {
     try {
         const courseId = req.params.id;
 
@@ -110,20 +110,20 @@ exports.getCourseCurriculum = async(req, res) => {
     }
 };
 
-// @desc    Enroll in a course
-// @route   POST /api/courses/:id/enroll
+// @desc    Enroll in an internship
+// @route   POST /api/internships/:id/enroll
 // @access  Private
-exports.enrollCourse = async(req, res) => {
+exports.enrollInternship = async(req, res) => {
     try {
         const courseId = req.params.id;
         const userId = req.user.id;
 
-        // Check if course exists
-        const course = await Course.findById(courseId);
-        if (!course || !course.isActive) {
+        // Check if internship exists
+        const internship = await Internship.findById(courseId);
+        if (!internship || !internship.isActive) {
             return res.status(404).json({
                 success: false,
-                message: 'Course not found or inactive'
+                message: 'Internship not found or inactive'
             });
         }
 
@@ -136,7 +136,7 @@ exports.enrollCourse = async(req, res) => {
         if (existingEnrollment) {
             return res.status(400).json({
                 success: false,
-                message: 'Already enrolled in this course'
+                message: 'Already enrolled in this internship'
             });
         }
 
@@ -152,14 +152,14 @@ exports.enrollCourse = async(req, res) => {
             currentModuleId: firstModule ? firstModule._id : null
         });
 
-        // Update course enrollment count
-        await Course.findByIdAndUpdate(courseId, {
+        // Update internship enrollment count
+        await Internship.findByIdAndUpdate(courseId, {
             $inc: { enrollmentCount: 1 }
         });
 
         res.status(201).json({
             success: true,
-            message: 'Successfully enrolled in course',
+            message: 'Successfully enrolled in internship',
             data: enrollment
         });
     } catch (error) {
@@ -171,10 +171,10 @@ exports.enrollCourse = async(req, res) => {
     }
 };
 
-// @desc    Get user's enrolled courses
-// @route   GET /api/courses/enrolled
+// @desc    Get user's enrolled internships
+// @route   GET /api/internships/enrolled
 // @access  Private
-exports.getEnrolledCourses = async(req, res) => {
+exports.getEnrolledInternships = async(req, res) => {
     try {
         const enrollments = await Enrollment.find({
                 userId: req.user.id,
@@ -189,10 +189,10 @@ exports.getEnrolledCourses = async(req, res) => {
             data: enrollments
         });
     } catch (error) {
-        console.error('Get enrolled courses error:', error);
+        console.error('Get enrolled internships error:', error);
         res.status(500).json({
             success: false,
-            message: 'Server error while fetching enrolled courses'
+            message: 'Server error while fetching enrolled internships'
         });
     }
 };

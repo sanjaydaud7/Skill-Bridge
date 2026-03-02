@@ -19,7 +19,6 @@ const certificateSchema = new mongoose.Schema({
     },
     certificateNumber: {
         type: String,
-        required: true,
         unique: true
     },
     issuedAt: {
@@ -44,7 +43,6 @@ const certificateSchema = new mongoose.Schema({
     }],
     verificationCode: {
         type: String,
-        required: true,
         unique: true
     },
     isValid: {

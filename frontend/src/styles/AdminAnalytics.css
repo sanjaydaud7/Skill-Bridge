@@ -143,13 +143,13 @@
     color: #1e293b;
 }
 
-.courses-revenue-list {
+.internships-revenue-list {
     display: flex;
     flex-direction: column;
     gap: 1rem;
 }
 
-.course-revenue-item {
+.internship-revenue-item {
     display: flex;
     align-items: center;
     gap: 1.5rem;
@@ -159,11 +159,11 @@
     transition: transform 0.2s ease;
 }
 
-.course-revenue-item:hover {
+.internship-revenue-item:hover {
     transform: translateX(4px);
 }
 
-.course-rank {
+.internship-rank {
     width: 48px;
     height: 48px;
     border-radius: 10px;
@@ -176,23 +176,23 @@
     font-weight: 700;
 }
 
-.course-details {
+.internship-details {
     flex: 1;
 }
 
-.course-name {
+.internship-name {
     font-weight: 600;
     color: #1e293b;
     margin-bottom: 0.25rem;
 }
 
-.course-revenue {
+.internship-revenue {
     font-size: 1.25rem;
     font-weight: 700;
     color: #059669;
 }
 
-.course-enrollments {
+.internship-enrollments {
     color: #64748b;
     font-size: 0.875rem;
 }
@@ -223,20 +223,20 @@
     font-weight: 600;
 }
 
-.courses-analytics-list {
+.internships-analytics-list {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
 }
 
-.course-analytics-card {
+.internship-analytics-card {
     background: white;
     padding: 2rem;
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.course-header {
+.internship-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -245,13 +245,13 @@
     border-bottom: 2px solid #e2e8f0;
 }
 
-.course-header h3 {
+.internship-header h3 {
     margin: 0;
     font-size: 1.25rem;
     color: #1e293b;
 }
 
-.course-category {
+.internship-category {
     padding: 0.5rem 1rem;
     background: #dbeafe;
     color: #1e40af;
@@ -341,7 +341,7 @@
     .stats-cards {
         grid-template-columns: 1fr;
     }
-    .course-metrics {
+    .internship-metrics {
         grid-template-columns: repeat(2, 1fr);
     }
 }
