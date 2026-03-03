@@ -112,19 +112,11 @@ const Navbar = () => {
         <div className="navbar-cta">
           {isAuthenticated() ? (
             <>
-              {user?.role === 'admin' && (
-                <Link to="/admin/dashboard" className="btn btn-gradient admin-panel-btn">
-                  <span style={{ marginRight: '0.5rem' }}>⚙️</span>
-                  Admin Panel
-                </Link>
-              )}
               <div className="profile-menu-container" ref={profileMenuRef}>
                 <div className="profile-icon" onClick={toggleProfileMenu}>
-                <img 
-                  src={user?.profilePicture || 'https://via.placeholder.com/40'} 
-                  alt={user?.name} 
-                  className="profile-avatar"
-                />
+                <div className="profile-avatar-initials">
+                  {user?.name?.charAt(0).toUpperCase() || 'U'}
+                </div>
                 <span className="profile-name">{user?.name}</span>
                 <svg 
                   className={`profile-arrow ${isProfileMenuOpen ? 'profile-arrow-up' : ''}`}
@@ -140,11 +132,9 @@ const Navbar = () => {
               {isProfileMenuOpen && (
                 <div className="profile-dropdown">
                   <div className="profile-dropdown-header">
-                    <img 
-                      src={user?.profilePicture || 'https://via.placeholder.com/50'} 
-                      alt={user?.name}
-                      className="profile-dropdown-avatar"
-                    />
+                    <div className="profile-dropdown-avatar-initials">
+                      {user?.name?.charAt(0).toUpperCase() || 'U'}
+                    </div>
                     <div className="profile-dropdown-info">
                       <h4>{user?.name}</h4>
                       <p>{user?.email}</p>
@@ -224,11 +214,9 @@ const Navbar = () => {
           {isAuthenticated() ? (
             <div className="mobile-profile-menu">
               <div className="mobile-profile-header">
-                <img 
-                  src={user?.profilePicture || 'https://via.placeholder.com/50'} 
-                  alt={user?.name}
-                  className="mobile-profile-avatar"
-                />
+                <div className="mobile-profile-avatar-initials">
+                  {user?.name?.charAt(0).toUpperCase() || 'U'}
+                </div>
                 <div className="mobile-profile-info">
                   <h4>{user?.name}</h4>
                   <span className={`role-badge role-${user?.role}`}>
