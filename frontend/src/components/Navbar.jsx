@@ -57,7 +57,7 @@ const Navbar = () => {
     { name: 'Features', href: '#features' },
     { name: 'How It Works', href: '#how-it-works' },
     { name: 'Certificate', href: '#certificate' },
-    { name: 'Contact', href: '#contact' }
+    { name: 'Contact', href: '/contact', isRoute: true }
   ];
 
   const getProfileMenuItems = () => {

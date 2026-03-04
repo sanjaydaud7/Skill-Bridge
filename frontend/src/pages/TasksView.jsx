@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
 import { useDropzone } from 'react-dropzone';
 import axios from 'axios';
 import '../styles/Tasks.css';
@@ -342,6 +343,7 @@ const TasksView = () => {
           </div>
         )}
       </div>
+      <Footer />
     </div>
   );
 };

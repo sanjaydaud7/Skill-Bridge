@@ -18,6 +18,30 @@ import AdminUsers from './pages/admin/AdminUsers';
 import AdminCertificates from './pages/admin/AdminCertificates';
 import AdminPayments from './pages/admin/AdminPayments';
 import AdminAnalytics from './pages/admin/AdminAnalytics';
+// Static Pages
+import AboutUs from './pages/static/AboutUs';
+import OurTeam from './pages/static/OurTeam';
+import Careers from './pages/static/Careers';
+import NewsUpdates from './pages/static/NewsUpdates';
+import Contact from './pages/static/Contact';
+import Investors from './pages/static/Investors';
+import RemoteOpportunities from './pages/static/RemoteOpportunities';
+import TechInternships from './pages/static/TechInternships';
+import BusinessInternships from './pages/static/BusinessInternships';
+import DesignInternships from './pages/static/DesignInternships';
+import ForCompanies from './pages/static/ForCompanies';
+import HelpCenter from './pages/static/HelpCenter';
+import FAQ from './pages/static/FAQ';
+import StudentGuides from './pages/static/StudentGuides';
+import Resources from './pages/static/Resources';
+import CommunityForum from './pages/static/CommunityForum';
+import GiveFeedback from './pages/static/GiveFeedback';
+import PrivacyPolicy from './pages/static/PrivacyPolicy';
+import TermsOfService from './pages/static/TermsOfService';
+import CookiePolicy from './pages/static/CookiePolicy';
+import SecurityPage from './pages/static/SecurityPage';
+import Accessibility from './pages/static/Accessibility';
+import GDPRCompliance from './pages/static/GDPRCompliance';
 
 function App() {
   return (
@@ -42,6 +66,38 @@ function App() {
         <Route path="/admin/certificates" element={<AdminRoute><AdminCertificates /></AdminRoute>} />
         <Route path="/admin/payments" element={<AdminRoute><AdminPayments /></AdminRoute>} />
         <Route path="/admin/analytics" element={<AdminRoute><AdminAnalytics /></AdminRoute>} />
+
+        {/* Company Routes */}
+        <Route path="/about" element={<AboutUs />} />
+        <Route path="/team" element={<OurTeam />} />
+        <Route path="/careers" element={<Careers />} />
+        <Route path="/news" element={<NewsUpdates />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/investors" element={<Investors />} />
+
+        {/* Internship Category Routes */}
+        <Route path="/internships/browse" element={<Navigate to="/" replace />} />
+        <Route path="/internships/remote" element={<RemoteOpportunities />} />
+        <Route path="/internships/tech" element={<TechInternships />} />
+        <Route path="/internships/business" element={<BusinessInternships />} />
+        <Route path="/internships/design" element={<DesignInternships />} />
+        <Route path="/for-companies" element={<ForCompanies />} />
+
+        {/* Support Routes */}
+        <Route path="/help" element={<HelpCenter />} />
+        <Route path="/faq" element={<FAQ />} />
+        <Route path="/student-guides" element={<StudentGuides />} />
+        <Route path="/resources" element={<Resources />} />
+        <Route path="/community" element={<CommunityForum />} />
+        <Route path="/feedback" element={<GiveFeedback />} />
+
+        {/* Legal Routes */}
+        <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/terms" element={<TermsOfService />} />
+        <Route path="/cookies" element={<CookiePolicy />} />
+        <Route path="/security" element={<SecurityPage />} />
+        <Route path="/accessibility" element={<Accessibility />} />
+        <Route path="/gdpr" element={<GDPRCompliance />} />
       </Routes>
     </AuthProvider>
   );

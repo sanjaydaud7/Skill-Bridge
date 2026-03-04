@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
 import '../styles/NewModernApp.css';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
@@ -807,12 +808,12 @@ function HomePage() {
                 <div className="footer-column">
                   <h4 className="column-title">Company</h4>
                   <ul className="footer-links">
-                    <li><a href="#about">About Us</a></li>
-                    <li><a href="#team">Our Team</a></li>
-                    <li><a href="#careers">Careers</a></li>
-                    <li><a href="#news">News & Updates</a></li>
-                    <li><a href="#contact">Contact</a></li>
-                    <li><a href="#investors">Investors</a></li>
+                    <li><Link to="/about">About Us</Link></li>
+                    <li><Link to="/team">Our Team</Link></li>
+                    <li><Link to="/careers">Careers</Link></li>
+                    <li><Link to="/news">News &amp; Updates</Link></li>
+                    <li><Link to="/contact">Contact</Link></li>
+                    <li><Link to="/investors">Investors</Link></li>
                   </ul>
                 </div>
 
@@ -820,12 +821,12 @@ function HomePage() {
                 <div className="footer-column">
                   <h4 className="column-title">Internships</h4>
                   <ul className="footer-links">
-                    <li><a href="#browse">Browse Internships</a></li>
-                    <li><a href="#remote">Remote Opportunities</a></li>
-                    <li><a href="#tech">Tech Internships</a></li>
-                    <li><a href="#business">Business Internships</a></li>
-                    <li><a href="#design">Design Internships</a></li>
-                    <li><a href="#for-companies">For Companies</a></li>
+                    <li><Link to="/internships/browse">Browse Internships</Link></li>
+                    <li><Link to="/internships/remote">Remote Opportunities</Link></li>
+                    <li><Link to="/internships/tech">Tech Internships</Link></li>
+                    <li><Link to="/internships/business">Business Internships</Link></li>
+                    <li><Link to="/internships/design">Design Internships</Link></li>
+                    <li><Link to="/for-companies">For Companies</Link></li>
                   </ul>
                 </div>
 
@@ -833,12 +834,12 @@ function HomePage() {
                 <div className="footer-column">
                   <h4 className="column-title">Support</h4>
                   <ul className="footer-links">
-                    <li><a href="#help">Help Center</a></li>
-                    <li><a href="#faq">FAQ</a></li>
-                    <li><a href="#guides">Student Guides</a></li>
-                    <li><a href="#resources">Resources</a></li>
-                    <li><a href="#community">Community Forum</a></li>
-                    <li><a href="#feedback">Give Feedback</a></li>
+                    <li><Link to="/help">Help Center</Link></li>
+                    <li><Link to="/faq">FAQ</Link></li>
+                    <li><Link to="/student-guides">Student Guides</Link></li>
+                    <li><Link to="/resources">Resources</Link></li>
+                    <li><Link to="/community">Community Forum</Link></li>
+                    <li><Link to="/feedback">Give Feedback</Link></li>
                   </ul>
                 </div>
 
@@ -846,12 +847,12 @@ function HomePage() {
                 <div className="footer-column">
                   <h4 className="column-title">Legal</h4>
                   <ul className="footer-links">
-                    <li><a href="#privacy">Privacy Policy</a></li>
-                    <li><a href="#terms">Terms of Service</a></li>
-                    <li><a href="#cookies">Cookie Policy</a></li>
-                    <li><a href="#security">Security</a></li>
-                    <li><a href="#accessibility">Accessibility</a></li>
-                    <li><a href="#compliance">GDPR Compliance</a></li>
+                    <li><Link to="/privacy">Privacy Policy</Link></li>
+                    <li><Link to="/terms">Terms of Service</Link></li>
+                    <li><Link to="/cookies">Cookie Policy</Link></li>
+                    <li><Link to="/security">Security</Link></li>
+                    <li><Link to="/accessibility">Accessibility</Link></li>
+                    <li><Link to="/gdpr">GDPR Compliance</Link></li>
                   </ul>
                 </div>
               </div>

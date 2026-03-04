@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
 import axios from 'axios';
 import '../styles/InternshipView.css';
 import { saveAs } from 'file-saver';
@@ -664,6 +665,7 @@ const InternshipView = () => {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 };

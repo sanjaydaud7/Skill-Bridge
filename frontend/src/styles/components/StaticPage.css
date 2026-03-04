@@ -1,0 +1,449 @@
+/* ============================================
+   STATIC PAGE - SHARED LAYOUT STYLES
+   ============================================ */
+
+.static-page-wrapper {
+    min-height: 100vh;
+    background: #f8fafc;
+    font-family: 'Inter', sans-serif;
+}
+
+.static-hero {
+    padding: 7rem 2rem 4rem;
+    text-align: center;
+    color: white;
+}
+
+.static-hero-content {
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.static-breadcrumb {
+    font-size: 0.85rem;
+    opacity: 0.85;
+    margin-bottom: 1.2rem;
+}
+
+.static-breadcrumb a {
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.static-breadcrumb a:hover {
+    text-decoration: underline;
+}
+
+.breadcrumb-sep {
+    opacity: 0.6;
+}
+
+.static-hero-title {
+    font-size: 2.8rem;
+    font-weight: 800;
+    margin-bottom: 0.75rem;
+    line-height: 1.15;
+}
+
+.static-hero-subtitle {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    line-height: 1.6;
+    max-width: 560px;
+    margin: 0 auto;
+}
+
+.static-page-body {
+    padding: 3.5rem 2rem 5rem;
+}
+
+.static-page-container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+
+/* ----- Card ---- */
+
+.sp-card {
+    background: white;
+    border-radius: 16px;
+    padding: 2.5rem;
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
+    margin-bottom: 2rem;
+}
+
+.sp-card h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.sp-card p {
+    color: #475569;
+    line-height: 1.8;
+    margin-bottom: 1rem;
+    font-size: 0.975rem;
+}
+
+.sp-card p:last-child {
+    margin-bottom: 0;
+}
+
+.sp-card ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.sp-card ul li {
+    color: #475569;
+    font-size: 0.95rem;
+    padding-left: 1.4rem;
+    position: relative;
+    line-height: 1.6;
+}
+
+.sp-card ul li::before {
+    content: '✦';
+    position: absolute;
+    left: 0;
+    color: #667eea;
+    font-size: 0.65rem;
+    top: 4px;
+}
+
+
+/* ---- Section heading ---- */
+
+.sp-section-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #667eea;
+    margin-bottom: 0.4rem;
+}
+
+
+/* ---- Grid layouts ---- */
+
+.sp-grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+}
+
+.sp-grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+}
+
+.sp-grid-card {
+    background: white;
+    border-radius: 14px;
+    padding: 1.75rem;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.sp-grid-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.15);
+}
+
+.sp-grid-card .card-icon {
+    font-size: 2rem;
+    margin-bottom: 0.75rem;
+}
+
+.sp-grid-card h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 0.5rem;
+}
+
+.sp-grid-card p {
+    font-size: 0.875rem;
+    color: #64748b;
+    line-height: 1.6;
+}
+
+
+/* ---- CTA block ---- */
+
+.sp-cta-block {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 16px;
+    padding: 2.5rem;
+    text-align: center;
+    color: white;
+    margin-bottom: 2rem;
+}
+
+.sp-cta-block h2 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+}
+
+.sp-cta-block p {
+    opacity: 0.9;
+    margin-bottom: 1.5rem;
+    font-size: 1rem;
+}
+
+.sp-btn {
+    display: inline-block;
+    padding: 0.8rem 2rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    border: none;
+}
+
+.sp-btn-white {
+    background: white;
+    color: #667eea;
+}
+
+.sp-btn-white:hover {
+    background: #f1f5f9;
+    transform: translateY(-2px);
+}
+
+.sp-btn-outline-white {
+    background: transparent;
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.7);
+}
+
+.sp-btn-outline-white:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+
+/* ---- Team card ---- */
+
+.sp-team-card {
+    background: white;
+    border-radius: 14px;
+    padding: 1.75rem;
+    text-align: center;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    transition: transform 0.2s ease;
+}
+
+.sp-team-card:hover {
+    transform: translateY(-4px);
+}
+
+.sp-team-avatar {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: white;
+    margin: 0 auto 1rem;
+}
+
+.sp-team-card h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 0.25rem;
+}
+
+.sp-team-card .role {
+    font-size: 0.8rem;
+    color: #667eea;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+}
+
+.sp-team-card p {
+    font-size: 0.85rem;
+    color: #64748b;
+    line-height: 1.5;
+}
+
+
+/* ---- FAQ accordion ---- */
+
+.sp-faq-item {
+    background: white;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+.sp-faq-question {
+    padding: 1.2rem 1.5rem;
+    font-weight: 600;
+    font-size: 0.975rem;
+    color: #1e293b;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.sp-faq-question:hover {
+    background: rgba(102, 126, 234, 0.05);
+}
+
+.sp-faq-answer {
+    padding: 0 1.5rem 1.2rem;
+    color: #475569;
+    font-size: 0.925rem;
+    line-height: 1.7;
+}
+
+
+/* ---- Contact form ---- */
+
+.sp-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.sp-form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.2rem;
+}
+
+.sp-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.sp-form-group label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #374151;
+}
+
+.sp-form-group input,
+.sp-form-group textarea,
+.sp-form-group select {
+    padding: 0.75rem 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-family: inherit;
+    color: #1e293b;
+    transition: border-color 0.2s;
+    outline: none;
+    resize: vertical;
+}
+
+.sp-form-group input:focus,
+.sp-form-group textarea:focus,
+.sp-form-group select:focus {
+    border-color: #667eea;
+}
+
+.sp-btn-gradient {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 0.85rem 2rem;
+    border-radius: 8px;
+    border: none;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s;
+    align-self: flex-start;
+}
+
+.sp-btn-gradient:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+}
+
+
+/* ---- Legal styles ---- */
+
+.sp-legal-toc {
+    background: #f1f5f9;
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.sp-legal-toc h4 {
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #64748b;
+    margin-bottom: 0.75rem;
+}
+
+.sp-legal-toc ol {
+    padding-left: 1.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.sp-legal-toc ol li a {
+    color: #667eea;
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.sp-legal-toc ol li a:hover {
+    text-decoration: underline;
+}
+
+.sp-legal-date {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    margin-bottom: 2rem;
+    display: block;
+}
+
+
+/* ---- Responsive ---- */
+
+@media (max-width: 768px) {
+    .static-hero-title {
+        font-size: 2rem;
+    }
+    .sp-grid-2,
+    .sp-grid-3 {
+        grid-template-columns: 1fr;
+    }
+    .sp-form-row {
+        grid-template-columns: 1fr;
+    }
+    .static-page-body {
+        padding: 2.5rem 1rem 4rem;
+    }
+}

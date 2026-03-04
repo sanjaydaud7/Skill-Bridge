@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import Footer from '../components/Footer';
 import '../styles/Auth.css';
 
 const Login = () => {
@@ -60,6 +61,7 @@ const Login = () => {
   };
 
   return (
+    <>
     <div className="auth-container">
       <div className="auth-card">
         <div className="auth-header">
@@ -117,6 +119,8 @@ const Login = () => {
         </div>
       </div>
     </div>
+    <Footer />
+    </>
   );
 };
 
