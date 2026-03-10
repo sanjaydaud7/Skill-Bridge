@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import NotificationBell from './NotificationBell';
 import '../styles/components/Navbar.css';
 
 const Navbar = () => {
@@ -71,8 +72,8 @@ const Navbar = () => {
       ];
     } else {
       return [
-        { name: 'Dashboard', path: '/dashboard', icon: '📊' },
-        { name: 'Certificates', path: '/dashboard/certificates', icon: '🏆' },
+        { name: 'Dashboard', path: '/dashboard', icon: '📊' },        { name: 'My Portfolio', path: '/portfolio/me', icon: '🌟' },
+        { name: 'Resume Builder', path: '/resume-builder', icon: '📄' },        { name: 'Certificates', path: '/dashboard/certificates', icon: '🏆' },
         { name: 'Profile', path: '/profile', icon: '👤' },
         { name: 'Logout', action: handleLogout, icon: '🚪' }
       ];
@@ -112,6 +113,7 @@ const Navbar = () => {
         <div className="navbar-cta">
           {isAuthenticated() ? (
             <>
+              <NotificationBell />
               <div className="profile-menu-container" ref={profileMenuRef}>
                 <div className="profile-icon" onClick={toggleProfileMenu}>
                 <div className="profile-avatar-initials">

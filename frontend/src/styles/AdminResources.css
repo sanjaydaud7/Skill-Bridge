@@ -1,0 +1,179 @@
+/* AdminResources.css — matches SkillBridge admin design system */
+
+/* ─── Page Layout ────────────────────────────────────────────────────────────── */
+.ar-page { padding: 28px 32px; background: #f8fafc; min-height: 100vh; }
+.ar-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
+.ar-title { font-size: 1.75rem; font-weight: 700; color: #0D1B4B; margin: 0 0 4px 0; }
+.ar-subtitle { color: #64748b; font-size: 0.9rem; }
+
+/* ─── Buttons ────────────────────────────────────────────────────────────────── */
+.ar-btn-primary {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 20px; background: linear-gradient(135deg, #0D1B4B, #162362);
+    color: #E8B84B; border: none; border-radius: 10px;
+    font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: opacity 0.2s;
+}
+.ar-btn-primary:hover { opacity: 0.9; }
+.ar-btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+.ar-btn-secondary {
+    padding: 10px 20px; background: #f1f5f9; color: #475569;
+    border: 1px solid #e2e8f0; border-radius: 10px;
+    font-size: 0.875rem; font-weight: 500; cursor: pointer; transition: background 0.2s;
+}
+.ar-btn-secondary:hover { background: #e2e8f0; }
+.ar-btn-danger {
+    padding: 10px 20px; background: #ef4444; color: #fff;
+    border: none; border-radius: 10px;
+    font-size: 0.875rem; font-weight: 600; cursor: pointer;
+}
+.ar-btn-danger:hover { background: #dc2626; }
+
+/* ─── Stats Bar ──────────────────────────────────────────────────────────────── */
+.ar-stats { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+.ar-stat-card {
+    display: flex; align-items: center; gap: 12px;
+    padding: 16px 24px; background: #fff; border-radius: 12px;
+    border: 1px solid #e2e8f0; box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    flex: 1; min-width: 140px;
+}
+.ar-stat-card .material-icons { font-size: 28px; color: #64748b; }
+.ar-stat-green .material-icons { color: #10b981; }
+.ar-stat-blue   .material-icons { color: #3b82f6; }
+.ar-stat-purple .material-icons { color: #8b5cf6; }
+.ar-stat-card strong { font-size: 1.5rem; font-weight: 700; color: #0D1B4B; display: block; }
+.ar-stat-card span { font-size: 0.8rem; color: #64748b; }
+
+/* ─── Filters ────────────────────────────────────────────────────────────────── */
+.ar-filters { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+.ar-search-wrap {
+    display: flex; align-items: center; gap: 8px;
+    flex: 1; min-width: 220px; padding: 10px 14px;
+    background: #fff; border: 1px solid #e2e8f0; border-radius: 10px;
+}
+.ar-search-wrap .material-icons { color: #94a3b8; font-size: 18px; }
+.ar-search { border: none; outline: none; flex: 1; font-size: 0.875rem; color: #1e293b; background: transparent; }
+.ar-select {
+    padding: 10px 14px; background: #fff; border: 1px solid #e2e8f0;
+    border-radius: 10px; font-size: 0.875rem; color: #475569; cursor: pointer; outline: none;
+}
+
+/* ─── Table ──────────────────────────────────────────────────────────────────── */
+.ar-table-wrap { background: #fff; border-radius: 14px; border: 1px solid #e2e8f0; overflow: hidden; }
+.ar-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+.ar-table thead { background: linear-gradient(135deg, #0D1B4B, #162362); }
+.ar-table thead th { padding: 14px 16px; color: #E8B84B; font-weight: 600; text-align: left; font-size: 0.8rem; letter-spacing: 0.5px; }
+.ar-table tbody tr { border-bottom: 1px solid #f1f5f9; transition: background 0.15s; }
+.ar-table tbody tr:hover { background: #f8fafc; }
+.ar-table tbody tr:last-child { border-bottom: none; }
+.ar-table td { padding: 14px 16px; vertical-align: middle; }
+.ar-row-inactive { opacity: 0.55; }
+
+.ar-type-badge { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 500; text-transform: capitalize; }
+.ar-type-badge .material-icons { font-size: 18px; }
+.ar-title-cell strong { display: block; color: #1e293b; }
+.ar-title-cell small { display: block; color: #94a3b8; font-size: 0.77rem; margin-top: 2px; }
+.ar-muted { color: #94a3b8; }
+.ar-tag {
+    display: inline-block; padding: 3px 10px; border-radius: 20px;
+    font-size: 0.75rem; font-weight: 500; white-space: nowrap;
+}
+.ar-tag-global { background: #d1fae5; color: #065f46; }
+.ar-tag-intern { background: #dbeafe; color: #1d4ed8; }
+
+.ar-toggle {
+    padding: 4px 12px; border-radius: 20px; border: none;
+    font-size: 0.75rem; font-weight: 600; cursor: pointer;
+}
+.ar-toggle-on  { background: #d1fae5; color: #065f46; }
+.ar-toggle-off { background: #fee2e2; color: #991b1b; }
+
+.ar-actions { display: flex; gap: 8px; }
+.ar-icon-btn {
+    width: 32px; height: 32px; border-radius: 8px; border: none;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: background 0.15s; text-decoration: none;
+}
+.ar-icon-btn .material-icons { font-size: 16px; }
+.ar-view  { background: #eff6ff; color: #3b82f6; }
+.ar-view:hover  { background: #dbeafe; }
+.ar-edit  { background: #fef3c7; color: #d97706; }
+.ar-edit:hover  { background: #fde68a; }
+.ar-del   { background: #fee2e2; color: #ef4444; }
+.ar-del:hover   { background: #fecaca; }
+
+/* ─── Pagination ─────────────────────────────────────────────────────────────── */
+.ar-pagination { display: flex; align-items: center; justify-content: center; gap: 16px; padding: 16px; border-top: 1px solid #f1f5f9; font-size: 0.875rem; color: #64748b; }
+.ar-page-btn { padding: 6px 14px; border-radius: 8px; border: 1px solid #e2e8f0; background: #fff; cursor: pointer; font-size: 0.85rem; }
+.ar-page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ─── Empty / Loading ────────────────────────────────────────────────────────── */
+.ar-empty, .ar-loading { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; gap: 12px; background: #fff; border-radius: 14px; border: 1px solid #e2e8f0; color: #94a3b8; }
+.ar-empty .material-icons { font-size: 56px; color: #cbd5e1; }
+.ar-empty h3 { font-size: 1.1rem; color: #475569; margin: 0; }
+.ar-empty p { font-size: 0.875rem; margin: 0; }
+.ar-spinner { width: 36px; height: 36px; border: 3px solid #e2e8f0; border-top-color: #0D1B4B; border-radius: 50%; animation: ar-spin 0.8s linear infinite; }
+@keyframes ar-spin { to { transform: rotate(360deg); } }
+
+/* ─── Modal ──────────────────────────────────────────────────────────────────── */
+.ar-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 16px; }
+.ar-modal { background: #fff; border-radius: 16px; width: 100%; max-width: 560px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.25); }
+.ar-modal-sm { max-width: 380px; }
+.ar-modal-header { display: flex; justify-content: space-between; align-items: center; padding: 20px 24px; border-bottom: 1px solid #f1f5f9; }
+.ar-modal-header h2 { font-size: 1.1rem; font-weight: 700; color: #0D1B4B; margin: 0; }
+.ar-modal-close { background: none; border: none; cursor: pointer; color: #94a3b8; display: flex; align-items: center; }
+.ar-modal-close:hover { color: #475569; }
+.ar-modal-body { padding: 20px 24px; }
+.ar-modal-footer { display: flex; justify-content: flex-end; gap: 12px; margin-top: 20px; padding-top: 16px; border-top: 1px solid #f1f5f9; }
+
+/* ─── Form ───────────────────────────────────────────────────────────────────── */
+.ar-form-group { margin-bottom: 16px; }
+.ar-form-group label { display: block; font-size: 0.8rem; font-weight: 600; color: #475569; margin-bottom: 6px; }
+.ar-input { width: 100%; padding: 10px 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 0.875rem; color: #1e293b; outline: none; box-sizing: border-box; transition: border-color 0.15s; }
+.ar-input:focus { border-color: #0D1B4B; }
+.ar-textarea { min-height: 80px; resize: vertical; }
+
+/* Type selector chips */
+.ar-type-selector { display: flex; gap: 8px; flex-wrap: wrap; }
+.ar-type-btn {
+    display: flex; align-items: center; gap: 6px;
+    padding: 8px 14px; border-radius: 20px; border: 2px solid #e2e8f0;
+    background: #f8fafc; font-size: 0.8rem; font-weight: 500; cursor: pointer; transition: all 0.15s;
+}
+.ar-type-btn .material-icons { font-size: 16px; }
+.ar-type-btn.selected { border-color: #0D1B4B; background: #0D1B4B; color: #E8B84B; }
+
+/* Drop zone */
+.ar-dropzone {
+    border: 2px dashed #cbd5e1; border-radius: 12px; padding: 32px 20px;
+    text-align: center; cursor: pointer; transition: all 0.2s; color: #94a3b8;
+    margin-bottom: 4px;
+}
+.ar-dropzone:hover, .ar-dropzone.drag-over { border-color: #0D1B4B; background: #f0f4ff; }
+.ar-dropzone.has-file { border-color: #10b981; background: #f0fdf4; }
+.ar-drop-icon { font-size: 40px; color: #cbd5e1; display: block; margin-bottom: 8px; }
+.ar-dropzone p { margin: 4px 0; font-size: 0.875rem; }
+.ar-dropzone small { font-size: 0.77rem; color: #94a3b8; }
+.ar-file-chosen { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.ar-file-chosen .material-icons { font-size: 32px; color: #10b981; }
+.ar-file-chosen span { font-size: 0.875rem; color: #1e293b; font-weight: 500; }
+.ar-file-chosen small { color: #64748b; font-size: 0.77rem; }
+
+/* Progress bar */
+.ar-progress-wrap { background: #f1f5f9; border-radius: 8px; overflow: hidden; height: 8px; position: relative; margin: 12px 0; }
+.ar-progress-bar { height: 100%; background: linear-gradient(90deg, #0D1B4B, #E8B84B); transition: width 0.3s; }
+.ar-progress-wrap span { position: absolute; right: 0; top: 12px; font-size: 0.75rem; color: #64748b; }
+
+.ar-error { background: #fee2e2; color: #991b1b; padding: 10px 14px; border-radius: 8px; font-size: 0.875rem; margin-top: 8px; }
+.ar-file-url-preview { display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: #f8fafc; border-radius: 8px; font-size: 0.85rem; margin-bottom: 16px; }
+.ar-file-url-preview .material-icons { font-size: 18px; color: #64748b; }
+.ar-file-url-preview a { color: #3b82f6; text-decoration: none; }
+.ar-file-url-preview a:hover { text-decoration: underline; }
+
+@media (max-width: 768px) {
+    .ar-page { padding: 16px; }
+    .ar-header { flex-direction: column; gap: 14px; }
+    .ar-stats { gap: 10px; }
+    .ar-stat-card { min-width: 120px; }
+    .ar-table-wrap { overflow-x: auto; }
+    .ar-table { min-width: 600px; }
+}

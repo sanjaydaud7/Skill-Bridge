@@ -489,6 +489,16 @@
     box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
 }
 
+.profile-avatar-img {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+    border: 2px solid rgba(255, 255, 255, 0.6);
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+}
+
 .profile-name {
     font-weight: 600;
     color: #374151;
@@ -546,6 +556,15 @@
     justify-content: center;
     font-size: 1.3rem;
     font-weight: 700;
+    flex-shrink: 0;
+    border: 3px solid rgba(255, 255, 255, 0.7);
+}
+
+.profile-dropdown-avatar-img {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
     flex-shrink: 0;
     border: 3px solid rgba(255, 255, 255, 0.7);
 }

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
 import axios from 'axios';
 import '../styles/Dashboard.css';
 
@@ -604,38 +603,177 @@ const MyCertificates = () => {
 };
 
 // Resources & Materials Component
+const TYPE_ICONS = {
+  pdf: 'picture_as_pdf', image: 'image', document: 'description',
+  video: 'videocam', link: 'link', other: 'attach_file'
+};
+const TYPE_COLORS = {
+  pdf: '#ef4444', image: '#8b5cf6', document: '#3b82f6',
+  video: '#f59e0b', link: '#10b981', other: '#64748b'
+};
+
 const ResourcesMaterials = ({ enrolledCourses }) => {
+  const { token } = useAuth();
+  const [resources, setResources] = useState([]);
+  const [loadingRes, setLoadingRes] = useState(true);
+  const [typeFilter, setTypeFilter] = useState('');
+  const [scopeFilter, setScopeFilter] = useState('');
+
+  useEffect(() => {
+    const fetchResources = async () => {
+      setLoadingRes(true);
+      try {
+        const params = new URLSearchParams();
+        if (typeFilter)  params.set('type', typeFilter);
+        const res = await axios.get(`${API_URL}/resources?${params}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (res.data.success) setResources(res.data.data);
+      } catch (err) {
+        console.error('Resources fetch error:', err);
+      } finally {
+        setLoadingRes(false);
+      }
+    };
+    fetchResources();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [typeFilter, token]);
+
+  const handleOpen = async (resource) => {
+    try {
+      const res = await axios.post(`${API_URL}/resources/${resource._id}/download`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      window.open(res.data.fileUrl || resource.fileUrl, '_blank', 'noreferrer');
+    } catch {
+      window.open(resource.fileUrl, '_blank', 'noreferrer');
+    }
+  };
+
+  const globalResources  = resources.filter(r => !r.internshipId);
+  const internshipResources = resources.filter(r => r.internshipId);
+
+  const filtered = scopeFilter === 'global'
+    ? globalResources
+    : scopeFilter === 'internship'
+      ? internshipResources
+      : resources;
+
   return (
     <div className="dashboard-section">
       <div className="section-header">
         <h2>Resources & Materials</h2>
-        <span className="section-subtitle">Access INTERNSHIP materials and resources</span>
+        <span className="section-subtitle">Learning materials uploaded by admins</span>
       </div>
 
-      {enrolledCourses.length === 0 ? (
+      {/* Filters */}
+      <div style={{ display: 'flex', gap: 10, marginBottom: 18, flexWrap: 'wrap' }}>
+        <select
+          value={scopeFilter}
+          onChange={e => setScopeFilter(e.target.value)}
+          style={{ padding: '8px 12px', borderRadius: 8, border: '1px solid #e2e8f0', fontSize: '0.85rem', background: '#fff', cursor: 'pointer' }}
+        >
+          <option value="">All Resources</option>
+          <option value="global">Global</option>
+          <option value="internship">My Internships</option>
+        </select>
+        <select
+          value={typeFilter}
+          onChange={e => setTypeFilter(e.target.value)}
+          style={{ padding: '8px 12px', borderRadius: 8, border: '1px solid #e2e8f0', fontSize: '0.85rem', background: '#fff', cursor: 'pointer' }}
+        >
+          <option value="">All Types</option>
+          <option value="pdf">PDF</option>
+          <option value="image">Image</option>
+          <option value="document">Document</option>
+          <option value="video">Video</option>
+          <option value="link">Link</option>
+        </select>
+      </div>
+
+      {loadingRes ? (
+        <div className="dashboard-loading">
+          <div className="loading-spinner"></div>
+          <p>Loading resources…</p>
+        </div>
+      ) : filtered.length === 0 ? (
         <div className="empty-state">
-          <span className="material-icons empty-icon">folder</span>
-          <h3>No resources available</h3>
-          <p>Enroll in internships to access learning materials</p>
+          {enrolledCourses.length === 0 ? (
+            <>
+              <span className="material-icons empty-icon">folder</span>
+              <h3>No resources yet</h3>
+              <p>Enroll in internships to access learning materials</p>
+            </>
+          ) : (
+            <>
+              <span className="material-icons empty-icon">folder_open</span>
+              <h3>No resources available</h3>
+              <p>Your instructor hasn't uploaded any materials yet</p>
+            </>
+          )}
         </div>
       ) : (
-        <div className="resources-list">
-          {enrolledCourses.map((enrollment) => (
-            <div key={enrollment._id} className="resource-group">
-              <h4>{enrollment.courseId?.title || 'Untitled INTERNSHIP'}</h4>
-              <div className="resource-items">
-                <div className="resource-item">
-                  <span className="material-icons">description</span>
-                  <span>INTERNSHIP Materials</span>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
+          {filtered.map(resource => (
+            <div
+              key={resource._id}
+              style={{
+                background: '#fff', borderRadius: 12, border: '1px solid #e2e8f0',
+                padding: '18px', display: 'flex', flexDirection: 'column', gap: 10,
+                boxShadow: '0 1px 4px rgba(0,0,0,0.06)', transition: 'box-shadow 0.2s'
+              }}
+              onMouseEnter={e => e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.1)'}
+              onMouseLeave={e => e.currentTarget.style.boxShadow = '0 1px 4px rgba(0,0,0,0.06)'}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div style={{
+                  width: 40, height: 40, borderRadius: 10, display: 'flex',
+                  alignItems: 'center', justifyContent: 'center',
+                  background: `${TYPE_COLORS[resource.type]}22`
+                }}>
+                  <span className="material-icons" style={{ color: TYPE_COLORS[resource.type], fontSize: 22 }}>
+                    {TYPE_ICONS[resource.type] || 'attach_file'}
+                  </span>
                 </div>
-                <div className="resource-item">
-                  <span className="material-icons">code</span>
-                  <span>Code Samples</span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ margin: 0, fontWeight: 600, color: '#1e293b', fontSize: '0.9rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {resource.title}
+                  </p>
+                  <p style={{ margin: 0, fontSize: '0.75rem', color: '#94a3b8', textTransform: 'capitalize' }}>
+                    {resource.type}
+                  </p>
                 </div>
-                <div className="resource-item">
-                  <span className="material-icons">link</span>
-                  <span>External Resources</span>
-                </div>
+              </div>
+
+              {resource.description && (
+                <p style={{ margin: 0, fontSize: '0.82rem', color: '#64748b', lineHeight: 1.5 }}>
+                  {resource.description}
+                </p>
+              )}
+
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto' }}>
+                {resource.internshipId
+                  ? <span style={{ fontSize: '0.72rem', padding: '3px 8px', background: '#dbeafe', color: '#1d4ed8', borderRadius: 20, fontWeight: 500 }}>
+                      {resource.internshipId.title}
+                    </span>
+                  : <span style={{ fontSize: '0.72rem', padding: '3px 8px', background: '#d1fae5', color: '#065f46', borderRadius: 20, fontWeight: 500 }}>
+                      Global
+                    </span>
+                }
+                <button
+                  onClick={() => handleOpen(resource)}
+                  style={{
+                    padding: '6px 14px', background: 'linear-gradient(135deg, #0D1B4B, #162362)',
+                    color: '#E8B84B', border: 'none', borderRadius: 8,
+                    fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer',
+                    display: 'flex', alignItems: 'center', gap: 4
+                  }}
+                >
+                  <span className="material-icons" style={{ fontSize: 14 }}>
+                    {resource.type === 'link' ? 'open_in_new' : 'download'}
+                  </span>
+                  {resource.type === 'link' ? 'Open' : 'Download'}
+                </button>
               </div>
             </div>
           ))}
@@ -772,8 +910,10 @@ const StudentDashboard = () => {
     { id: 'projects', label: 'Final Projects', icon: 'work' },
     { id: 'progress', label: 'Progress Tracking', icon: 'insights' },
     { id: 'certificates', label: 'Certificates', icon: 'card_membership' },
+    { id: 'portfolio', label: 'My Portfolio', icon: 'person_pin', link: '/portfolio/me' },
+    { id: 'resume', label: 'Resume Builder', icon: 'description', link: '/resume-builder' },
     { id: 'resources', label: 'Resources', icon: 'folder' },
-    { id: 'profile', label: 'Profile Settings', icon: 'settings' },
+    { id: 'profile', label: 'Profile Settings', icon: 'settings', link: '/profile' },
   ];
 
   const renderSection = () => {
@@ -837,10 +977,11 @@ const StudentDashboard = () => {
               <button
                 key={item.id}
                 className={`nav-item ${activeSection === item.id ? 'active' : ''}`}
-                onClick={() => setActiveSection(item.id)}
+                onClick={() => item.link ? navigate(item.link) : setActiveSection(item.id)}
               >
                 <span className="material-icons">{item.icon}</span>
                 {sidebarOpen && <span>{item.label}</span>}
+                {sidebarOpen && item.link && <span className="material-icons" style={{fontSize:'14px',marginLeft:'auto',opacity:0.5}}>open_in_new</span>}
               </button>
             ))}
           </nav>
@@ -859,7 +1000,6 @@ const StudentDashboard = () => {
           {renderSection()}
         </main>
       </div>
-      <Footer />
     </div>
   );
 };

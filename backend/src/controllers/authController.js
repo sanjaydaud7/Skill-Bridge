@@ -1,5 +1,7 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
+const { sendEmail } = require('../utils/emailService');
+const { createNotification } = require('./notificationController');
 
 // Generate JWT Token
 const generateToken = (id) => {
@@ -35,6 +37,16 @@ exports.register = async(req, res) => {
 
         // Generate token
         const token = generateToken(user._id);
+
+        // Send welcome email & notification (non-blocking)
+        sendEmail({ to: user.email, templateName: 'welcome', templateData: { name: user.name } });
+        createNotification({
+            userId: user._id,
+            type: 'general',
+            title: 'Welcome to SkillBridge! 🎉',
+            message: 'Start your learning journey by exploring our internship programs.',
+            link: '/internships'
+        });
 
         res.status(201).json({
             success: true,

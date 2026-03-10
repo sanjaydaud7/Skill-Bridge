@@ -6,6 +6,8 @@ const Internship = require('../../models/Internship');
 const User = require('../../models/User');
 const Enrollment = require('../../models/Enrollment');
 const AdminLog = require('../../models/AdminLog');
+const { createNotification } = require('../notificationController');
+const { sendEmail } = require('../../utils/emailService');
 
 // @desc    Get all task submissions
 // @route   GET /api/admin/submissions/tasks
@@ -195,6 +197,33 @@ exports.reviewTaskSubmission = async(req, res) => {
             ipAddress: req.ip,
             userAgent: req.get('user-agent')
         });
+
+        // Notify student via Socket.io + Email
+        const studentId = submission.userId._id;
+        const studentEmail = submission.userId.email;
+        const studentName = submission.userId.name;
+        const taskTitle = submission.taskId.title;
+        const internshipTitle = submission.courseId?.title || 'your internship';
+
+        if (status === 'approved') {
+            createNotification({
+                userId: studentId,
+                type: 'submission_approved',
+                title: '✅ Task Approved!',
+                message: `Your submission for "${taskTitle}" has been approved${points != null ? ` with ${points} points` : ''}.`,
+                link: '/dashboard'
+            });
+            sendEmail({ to: studentEmail, templateName: 'submissionApproved', templateData: { name: studentName, taskTitle, internshipTitle, score: points, feedback } });
+        } else if (status === 'rejected' || status === 'revision-requested') {
+            createNotification({
+                userId: studentId,
+                type: 'submission_rejected',
+                title: '🔄 Revision Needed',
+                message: `Your submission for "${taskTitle}" needs revision. Check feedback and resubmit.`,
+                link: '/dashboard'
+            });
+            sendEmail({ to: studentEmail, templateName: 'submissionRejected', templateData: { name: studentName, taskTitle, internshipTitle, feedback } });
+        }
 
         res.json({
             success: true,

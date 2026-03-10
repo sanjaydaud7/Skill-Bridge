@@ -16,6 +16,8 @@ const InternshipDetail = () => {
   const [error, setError] = useState(null);
   const [isEnrolled, setIsEnrolled] = useState(false);
   const [enrolling, setEnrolling] = useState(false);
+  const [resources, setResources] = useState([]);
+  const [loadingResources, setLoadingResources] = useState(false);
 
   useEffect(() => {
     fetchInternshipDetails();
@@ -50,9 +52,24 @@ const InternshipDetail = () => {
           enrollment => enrollment.courseId._id === id
         );
         setIsEnrolled(enrolled);
+        if (enrolled) fetchResources(id);
       }
     } catch (err) {
       console.error('Error checking enrollment:', err);
+    }
+  };
+
+  const fetchResources = async (internshipId) => {
+    setLoadingResources(true);
+    try {
+      const res = await axios.get(`${API_URL}/resources/internship/${internshipId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.data.success) setResources(res.data.data || []);
+    } catch (err) {
+      console.error('Resources fetch error:', err);
+    } finally {
+      setLoadingResources(false);
     }
   };
 
@@ -304,6 +321,54 @@ const InternshipDetail = () => {
                   </li>
                 ))}
               </ul>
+            </div>
+          )}
+
+          {/* Resources Section (for enrolled students) */}
+          {isEnrolled && (
+            <div style={{ marginTop: '40px' }}>
+              <h2 style={{ fontSize: '1.75rem', color: '#1e293b', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: 10 }}>
+                <span className="material-icons" style={{ color: '#0D1B4B', fontSize: '1.75rem' }}>folder_open</span>
+                Learning Resources
+              </h2>
+              {loadingResources ? (
+                <p style={{ color: '#94a3b8' }}>Loading resources…</p>
+              ) : resources.length === 0 ? (
+                <div style={{ padding: '24px', background: '#f8fafc', borderRadius: '12px', textAlign: 'center', color: '#94a3b8' }}>
+                  <span className="material-icons" style={{ fontSize: 36, color: '#cbd5e1' }}>folder_open</span>
+                  <p style={{ margin: '8px 0 0' }}>No resources uploaded yet for this internship</p>
+                </div>
+              ) : (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 14 }}>
+                  {resources.map(r => {
+                    const iconMap = { pdf: 'picture_as_pdf', image: 'image', document: 'description', video: 'videocam', link: 'link', other: 'attach_file' };
+                    const colorMap = { pdf: '#ef4444', image: '#8b5cf6', document: '#3b82f6', video: '#f59e0b', link: '#10b981', other: '#64748b' };
+                    return (
+                      <div key={r._id} style={{ background: '#f8fafc', borderRadius: 12, padding: '16px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: 10 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                          <span className="material-icons" style={{ color: colorMap[r.type], fontSize: 22 }}>{iconMap[r.type] || 'attach_file'}</span>
+                          <div>
+                            <p style={{ margin: 0, fontWeight: 600, color: '#1e293b', fontSize: '0.875rem' }}>{r.title}</p>
+                            {r.internshipId
+                              ? <span style={{ fontSize: '0.72rem', color: '#1d4ed8' }}>For this internship</span>
+                              : <span style={{ fontSize: '0.72rem', color: '#065f46' }}>Global resource</span>}
+                          </div>
+                        </div>
+                        {r.description && <p style={{ margin: 0, fontSize: '0.8rem', color: '#64748b', lineHeight: 1.5 }}>{r.description}</p>}
+                        <a
+                          href={r.fileUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 14px', background: '#0D1B4B', color: '#E8B84B', borderRadius: 8, fontSize: '0.8rem', fontWeight: 600, textDecoration: 'none', marginTop: 'auto', alignSelf: 'flex-start' }}
+                        >
+                          <span className="material-icons" style={{ fontSize: 14 }}>{r.type === 'link' ? 'open_in_new' : 'download'}</span>
+                          {r.type === 'link' ? 'Open Link' : 'Download'}
+                        </a>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           )}
 

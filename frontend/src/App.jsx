@@ -1,6 +1,10 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { NotificationProvider } from './context/NotificationContext';
+import ResumeBuilder from './pages/ResumeBuilder';
+import Portfolio from './pages/Portfolio';
+import Profile from './pages/Profile';
 import HomePage from './pages/HomePage';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -18,6 +22,7 @@ import AdminUsers from './pages/admin/AdminUsers';
 import AdminCertificates from './pages/admin/AdminCertificates';
 import AdminPayments from './pages/admin/AdminPayments';
 import AdminAnalytics from './pages/admin/AdminAnalytics';
+import AdminResources from './pages/admin/AdminResources';
 // Static Pages
 import AboutUs from './pages/static/AboutUs';
 import OurTeam from './pages/static/OurTeam';
@@ -46,6 +51,7 @@ import GDPRCompliance from './pages/static/GDPRCompliance';
 function App() {
   return (
     <AuthProvider>
+      <NotificationProvider>
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<Login />} />
@@ -66,6 +72,7 @@ function App() {
         <Route path="/admin/certificates" element={<AdminRoute><AdminCertificates /></AdminRoute>} />
         <Route path="/admin/payments" element={<AdminRoute><AdminPayments /></AdminRoute>} />
         <Route path="/admin/analytics" element={<AdminRoute><AdminAnalytics /></AdminRoute>} />
+        <Route path="/admin/resources" element={<AdminRoute><AdminResources /></AdminRoute>} />
 
         {/* Company Routes */}
         <Route path="/about" element={<AboutUs />} />
@@ -98,7 +105,15 @@ function App() {
         <Route path="/security" element={<SecurityPage />} />
         <Route path="/accessibility" element={<Accessibility />} />
         <Route path="/gdpr" element={<GDPRCompliance />} />
+
+        {/* New Feature Routes */}
+        <Route path="/resume-builder" element={<ResumeBuilder />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/portfolio" element={<Navigate to="/portfolio/me" replace />} />
+        <Route path="/portfolio/me" element={<Portfolio />} />
+        <Route path="/portfolio/:username" element={<Portfolio />} />
       </Routes>
+      </NotificationProvider>
     </AuthProvider>
   );
 }

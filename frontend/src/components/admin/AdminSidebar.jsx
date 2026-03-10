@@ -8,6 +8,7 @@ const AdminSidebar = () => {
   const menuItems = [
     { path: '/admin/dashboard', icon: 'dashboard', label: 'Dashboard' },
     { path: '/admin/internships', icon: 'library_books', label: 'Internships' },
+    { path: '/admin/resources', icon: 'folder_open', label: 'Resources' },
     { path: '/admin/submissions', icon: 'assignment', label: 'Submissions' },
     { path: '/admin/enrollments', icon: 'school', label: 'Enrollments' },
     { path: '/admin/users', icon: 'people', label: 'Users' },

@@ -6,6 +6,8 @@ const TaskSubmission = require('../models/TaskSubmission');
 const ProjectSubmission = require('../models/ProjectSubmission');
 const Task = require('../models/Task');
 const PDFDocument = require('pdfkit');
+const { sendEmail } = require('../utils/emailService');
+const { createNotification } = require('./notificationController');
 
 // @desc    Check certificate eligibility
 // @route   GET /api/certificates/:courseId/eligibility
@@ -189,6 +191,28 @@ exports.generateCertificate = async(req, res) => {
         await certificate.save();
 
         console.log('Certificate generated successfully:', certificate._id);
+
+        // Notify student
+        const user = await require('../models/User').findById(userId).select('name email');
+        if (user) {
+            createNotification({
+                userId,
+                type: 'certificate_ready',
+                title: '🏆 Your Certificate is Ready!',
+                message: `Congratulations! Your certificate for "${course.title}" is ready to download.`,
+                link: '/certificates'
+            });
+            sendEmail({
+                to: user.email,
+                templateName: 'certificateReady',
+                templateData: {
+                    name: user.name,
+                    internshipTitle: course.title,
+                    certificateNumber: certificate.certificateNumber,
+                    downloadUrl: `${process.env.FRONTEND_URL}/certificates`
+                }
+            });
+        }
 
         res.status(201).json({
             success: true,

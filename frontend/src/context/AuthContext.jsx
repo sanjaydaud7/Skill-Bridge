@@ -41,6 +41,13 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('token', userToken);
   };
 
+  // Update stored user data (e.g. after profile edit)
+  const updateUser = (updatedFields) => {
+    const merged = { ...user, ...updatedFields };
+    setUser(merged);
+    localStorage.setItem('user', JSON.stringify(merged));
+  };
+
   const logout = () => {
     setUser(null);
     setToken(null);
@@ -58,6 +65,7 @@ export const AuthProvider = ({ children }) => {
     loading,
     login,
     logout,
+    updateUser,
     isAuthenticated
   };
 

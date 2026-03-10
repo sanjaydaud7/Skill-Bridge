@@ -26,7 +26,7 @@ const autoGenerateCertificate = async(userId, courseId, paymentId, enrollmentId)
             enrollmentId,
             paymentId,
             grade: 'A',
-            skills: course ? .skills || []
+            skills: course?.skills || []
         });
 
         console.log('🎉 Certificate created:', certificate._id, certificate.certificateNumber);

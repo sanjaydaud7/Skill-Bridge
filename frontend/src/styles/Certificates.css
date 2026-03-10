@@ -412,7 +412,8 @@
 }
 
 @keyframes highlight-pulse {
-    0%, 100% {
+    0%,
+    100% {
         transform: scale(1);
         box-shadow: 0 12px 48px rgba(102, 126, 234, 0.3);
     }
@@ -530,11 +531,13 @@
     border-top: 2px solid #e0e0e0;
 }
 
-.signature-line, .certificate-seal {
+.signature-line,
+.certificate-seal {
     text-align: center;
 }
 
-.signature-img, .seal {
+.signature-img,
+.seal {
     font-size: 32px;
     margin-bottom: 8px;
 }
@@ -565,9 +568,23 @@
 }
 
 @keyframes lockShake {
-    0%, 100% { transform: rotate(0deg); }
-    10%, 30%, 50%, 70%, 90% { transform: rotate(-5deg); }
-    20%, 40%, 60%, 80% { transform: rotate(5deg); }
+    0%,
+    100% {
+        transform: rotate(0deg);
+    }
+    10%,
+    30%,
+    50%,
+    70%,
+    90% {
+        transform: rotate(-5deg);
+    }
+    20%,
+    40%,
+    60%,
+    80% {
+        transform: rotate(5deg);
+    }
 }
 
 .lock-message {
@@ -804,7 +821,6 @@
     .certificate-unlock-section {
         grid-template-columns: 1fr;
     }
-    
     .certificate-frame {
         min-height: auto;
     }
