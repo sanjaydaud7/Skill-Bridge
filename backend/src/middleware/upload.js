@@ -5,14 +5,14 @@ const { CloudinaryStorage } = require('multer-storage-cloudinary');
 // Configure Cloudinary (reads from .env automatically via cloudinary.config)
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key:    process.env.CLOUDINARY_API_KEY,
+    api_key: process.env.CLOUDINARY_API_KEY,
     api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
 // Cloudinary storage — files land in skillbridge/resources/<type>
 const storage = new CloudinaryStorage({
     cloudinary,
-    params: async (req, file) => {
+    params: async(req, file) => {
         let folder = `${process.env.CLOUDINARY_FOLDER || 'skillbridge'}/resources`;
         let resourceType = 'auto';
 
@@ -76,7 +76,7 @@ const upload = multer({
 // ─── Avatar upload (profile pictures) ────────────────────────────────────────
 const avatarStorage = new CloudinaryStorage({
     cloudinary,
-    params: async (req, file) => ({
+    params: async(req, file) => ({
         folder: `${process.env.CLOUDINARY_FOLDER || 'skillbridge'}/avatars`,
         resource_type: 'image',
         format: 'webp',
@@ -97,8 +97,45 @@ const uploadAvatar = multer({
     limits: { fileSize: 5 * 1024 * 1024 } // 5 MB
 });
 
+// ─── Internship thumbnail upload ────────────────────────────────────────────
+const internshipThumbnailStorage = new CloudinaryStorage({
+    cloudinary,
+    params: async(req, file) => ({
+        folder: `${process.env.CLOUDINARY_FOLDER || 'skillbridge'}/internships`,
+        resource_type: 'image',
+        format: 'webp',
+        transformation: [{ width: 800, height: 600, crop: 'fill' }],
+        public_id: `internship_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    })
+});
+
+const internshipThumbnailFilter = (req, file, cb) => {
+    const allowed = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    if (allowed.includes(file.mimetype)) cb(null, true);
+    else cb(new Error('Only image files (JPEG, PNG, GIF, WebP) are allowed for internship thumbnails'), false);
+};
+
+const uploadInternshipThumbnail = multer({
+    storage: internshipThumbnailStorage,
+    fileFilter: internshipThumbnailFilter,
+    limits: { fileSize: 10 * 1024 * 1024 } // 10 MB
+});
+
+// Optional upload wrapper - handles both multipart and JSON requests
+const optionalUploadInternshipThumbnail = (req, res, next) => {
+    const contentType = req.headers['content-type'] || '';
+
+    // If it's multipart/form-data, use multer
+    if (contentType.includes('multipart/form-data')) {
+        return uploadInternshipThumbnail.single('thumbnail')(req, res, next);
+    }
+
+    // Otherwise, skip multer and continue
+    next();
+};
+
 // Helper: delete a file from Cloudinary by public_id
-const deleteFromCloudinary = async (publicId, resourceType = 'raw') => {
+const deleteFromCloudinary = async(publicId, resourceType = 'raw') => {
     try {
         await cloudinary.uploader.destroy(publicId, { resource_type: resourceType });
     } catch (err) {
@@ -106,4 +143,11 @@ const deleteFromCloudinary = async (publicId, resourceType = 'raw') => {
     }
 };
 
-module.exports = { upload, uploadAvatar, deleteFromCloudinary, cloudinary };
+module.exports = {
+    upload,
+    uploadAvatar,
+    uploadInternshipThumbnail,
+    optionalUploadInternshipThumbnail,
+    deleteFromCloudinary,
+    cloudinary
+};

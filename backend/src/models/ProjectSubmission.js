@@ -13,7 +13,7 @@ const projectSubmissionSchema = new mongoose.Schema({
     },
     courseId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Course',
+        ref: 'Internship',
         required: true
     },
     submittedAt: {

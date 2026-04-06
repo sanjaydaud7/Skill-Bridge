@@ -31,7 +31,7 @@ const resourceSchema = new mongoose.Schema({
     // ObjectId = scoped to a specific internship
     internshipId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Course',
+        ref: 'Internship',
         default: null
     },
     uploadedBy: {
@@ -40,7 +40,7 @@ const resourceSchema = new mongoose.Schema({
         required: true
     },
     fileSize: {
-        type: Number,  // bytes
+        type: Number, // bytes
         default: 0
     },
     mimeType: {

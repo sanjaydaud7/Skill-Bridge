@@ -1,0 +1,657 @@
+/* ============================================
+   GAMIFICATION STYLES
+   ============================================ */
+
+.gamification-dashboard,
+.streak-tracker,
+.leaderboard-view,
+.reward-points-widget {
+    animation: fadeIn 0.3s ease;
+}
+
+
+/* Streak Tracker */
+
+.streak-tracker {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    padding: 1.5rem;
+}
+
+.streak-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.streak-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.streak-icon {
+    font-size: 2.5rem;
+    line-height: 1;
+}
+
+.streak-content h4 {
+    margin: 0 0 0.5rem;
+    color: #64748b;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.streak-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.streak-label {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #94a3b8;
+}
+
+.streak-milestones {
+    grid-column: 1 / -1;
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.streak-milestones h5 {
+    margin: 0 0 1.5rem;
+    color: #1e293b;
+    font-size: 1.1rem;
+}
+
+.milestone {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 0;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.milestone:last-child {
+    border-bottom: none;
+}
+
+.milestone-label {
+    min-width: 80px;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.milestone-progress {
+    flex: 1;
+    height: 8px;
+    background: #e2e8f0;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.milestone-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #3b82f6, #10b981);
+    transition: width 0.3s ease;
+}
+
+.milestone-reward {
+    min-width: 40px;
+    text-align: center;
+    font-weight: 600;
+    color: #10b981;
+}
+
+.milestone.achieved .milestone-reward {
+    color: #10b981;
+}
+
+.btn-log-activity {
+    grid-column: 1 / -1;
+    background: #10b981;
+    color: white;
+    border: none;
+    padding: 0.75rem 2rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: all 0.3s;
+    margin-top: 1rem;
+}
+
+.btn-log-activity:hover {
+    background: #059669;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+
+/* Gamification Dashboard */
+
+.gamification-dashboard {
+    padding: 1.5rem;
+}
+
+.gamification-dashboard h2 {
+    font-size: 1.75rem;
+    margin-bottom: 2rem;
+    color: #1e293b;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-box {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.stat-box:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.stat-icon {
+    font-size: 2rem;
+    line-height: 1;
+}
+
+.stat-details {
+    flex: 1;
+}
+
+.stat-label {
+    font-size: 0.85rem;
+    color: #94a3b8;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.stat-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #1e293b;
+    line-height: 1;
+}
+
+.stat-sub {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    margin-top: 0.25rem;
+}
+
+.tier-progress {
+    color: #3b82f6;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-top: 0.5rem;
+}
+
+
+/* Recent Badges */
+
+.recent-badges {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.recent-badges h3 {
+    margin: 0 0 1rem;
+    color: #1e293b;
+}
+
+.badges-carousel {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.badge-mini {
+    position: relative;
+    width: 60px;
+    height: 60px;
+}
+
+.badge-mini img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: all 0.3s;
+}
+
+.badge-mini:hover img {
+    transform: scale(1.1);
+}
+
+.badge-tooltip {
+    position: absolute;
+    bottom: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1e293b;
+    color: white;
+    padding: 0.5rem 0.75rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    opacity: 0;
+    transition: opacity 0.3s;
+    white-space: nowrap;
+    z-index: 10;
+}
+
+.badge-mini:hover .badge-tooltip {
+    opacity: 1;
+}
+
+
+/* Level Progress */
+
+.level-progress {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.level-progress h3 {
+    margin: 0 0 1.5rem;
+    color: #1e293b;
+}
+
+.tiers-display {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 1rem;
+}
+
+.tier {
+    padding: 1rem;
+    text-align: center;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-weight: 600;
+    text-transform: capitalize;
+    color: #94a3b8;
+    transition: all 0.3s;
+}
+
+.tier.completed {
+    border-color: #10b981;
+    background: #f0fdf4;
+    color: #10b981;
+}
+
+.tier.active {
+    border-color: #3b82f6;
+    background: #f0f9ff;
+    color: #3b82f6;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+}
+
+
+/* Next Milestone */
+
+.next-milestone-card {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 8px 16px rgba(59, 130, 246, 0.3);
+}
+
+.next-milestone-card h3 {
+    margin: 0 0 1rem;
+}
+
+.progress-bar {
+    height: 8px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+}
+
+.progress-fill {
+    height: 100%;
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.next-milestone-card p {
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+
+/* Leaderboard */
+
+.leaderboard-view {
+    padding: 1.5rem;
+}
+
+.leaderboard-view h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    color: #1e293b;
+}
+
+.leaderboard-tabs {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.leaderboard-list {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.leaderboard-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.leaderboard-table thead {
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.leaderboard-table th {
+    padding: 1rem;
+    text-align: left;
+    color: #64748b;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.leaderboard-table td {
+    padding: 1rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.leaderboard-table tr:last-child td {
+    border-bottom: none;
+}
+
+.rank {
+    font-weight: 700;
+    font-size: 1.25rem;
+}
+
+.name {
+    color: #1e293b;
+    font-weight: 600;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.user-info img {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.points {
+    font-weight: 700;
+    color: #3b82f6;
+    font-size: 1.1rem;
+}
+
+.tier {
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.tier-bronze {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+.tier-silver {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.tier-gold {
+    background: #fef08a;
+    color: #ca8a04;
+}
+
+.tier-platinum {
+    background: #f3f4f6;
+    color: #4b5563;
+}
+
+.tier-diamond {
+    background: #cffafe;
+    color: #0c7792;
+}
+
+.current-streak,
+.longest-streak {
+    font-weight: 600;
+}
+
+.streak-badge {
+    background: #fef3c7;
+    color: #b45309;
+    padding: 0.4rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+}
+
+
+/* Reward Points Widget */
+
+.reward-points-widget {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.widget-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.widget-header h4 {
+    margin: 0;
+    color: #1e293b;
+}
+
+.tier-badge {
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    color: white;
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+.points-display {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.points-main,
+.points-available {
+    flex: 1;
+    text-align: center;
+}
+
+.points-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.points-label {
+    font-size: 0.85rem;
+    color: #94a3b8;
+    margin-top: 0.25rem;
+}
+
+.divider {
+    width: 2px;
+    height: 60px;
+    background: #e2e8f0;
+}
+
+.tier-discount {
+    background: #f8fafc;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.next-tier {
+    font-size: 0.85rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.achievements-mini {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.achievement {
+    background: #f1f5f9;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #475569;
+}
+
+.btn-history {
+    width: 100%;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    padding: 0.75rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s;
+    margin-top: 1rem;
+}
+
+.btn-history:hover {
+    background: #2563eb;
+}
+
+.history-dropdown {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 2px solid #e2e8f0;
+}
+
+.history-dropdown h5 {
+    margin: 0 0 1rem;
+    color: #1e293b;
+}
+
+.history-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border-radius: 6px;
+    background: #f8fafc;
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+}
+
+.history-icon {
+    font-size: 1.25rem;
+}
+
+.history-info {
+    flex: 1;
+}
+
+.history-description {
+    color: #1e293b;
+    font-weight: 500;
+}
+
+.history-date {
+    font-size: 0.8rem;
+    color: #94a3b8;
+}
+
+.history-amount {
+    font-weight: 700;
+    color: #10b981;
+    font-size: 0.95rem;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.loading-small {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    color: #64748b;
+    font-weight: 500;
+    min-height: 200px;
+}

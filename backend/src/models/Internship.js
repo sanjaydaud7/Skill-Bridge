@@ -94,4 +94,4 @@ internshipSchema.index({ title: 'text', description: 'text' });
 internshipSchema.index({ category: 1, difficulty: 1 });
 internshipSchema.index({ isActive: 1 });
 
-module.exports = mongoose.model('Course', internshipSchema);
+module.exports = mongoose.model('Internship', internshipSchema, 'iinternships');

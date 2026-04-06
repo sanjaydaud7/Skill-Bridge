@@ -31,6 +31,8 @@ const AdminInternships = () => {
     learningOutcomes: '',
     prerequisites: ''
   });
+  const [thumbnailFile, setThumbnailFile] = useState(null);
+  const [thumbnailPreview, setThumbnailPreview] = useState(null);
   const [creating, setCreating] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingCourse, setEditingCourse] = useState(null);
@@ -279,6 +281,38 @@ const AdminInternships = () => {
     }
   };
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        alert('Please select an image file');
+        return;
+      }
+      
+      // Validate file size (max 10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        alert('Image size should be less than 10MB');
+        return;
+      }
+      
+      setThumbnailFile(file);
+      
+      // Create preview
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setThumbnailPreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeThumbnail = () => {
+    setThumbnailFile(null);
+    setThumbnailPreview(null);
+    setCreateData({...createData, thumbnail: ''});
+  };
+
   const handleCreate = async (e) => {
     e.preventDefault();
     
@@ -286,21 +320,43 @@ const AdminInternships = () => {
       setCreating(true);
       const token = localStorage.getItem('token');
       
-      // Parse arrays from comma/newline separated strings
-      const formData = {
-        ...createData,
-        skills: createData.skills.split(',').map(s => s.trim()).filter(Boolean),
-        learningOutcomes: createData.learningOutcomes.split('\n').map(s => s.trim()).filter(Boolean),
-        prerequisites: createData.prerequisites.split('\n').map(s => s.trim()).filter(Boolean),
-        duration: parseInt(createData.duration),
-        certificatePrice: parseInt(createData.certificatePrice) || 0,
-        totalModules: 0,
-        totalTasks: 0,
-        isActive: true
-      };
+      // Use FormData for file upload
+      const formData = new FormData();
+      
+      // Add all fields
+      formData.append('title', createData.title);
+      formData.append('slug', createData.slug);
+      formData.append('description', createData.description);
+      formData.append('shortDescription', createData.shortDescription || '');
+      formData.append('category', createData.category);
+      formData.append('difficulty', createData.difficulty);
+      formData.append('duration', parseInt(createData.duration));
+      formData.append('certificatePrice', parseInt(createData.certificatePrice) || 0);
+      formData.append('totalModules', 0);
+      formData.append('totalTasks', 0);
+      formData.append('isActive', true);
+      
+      // Parse and add arrays
+      const skills = createData.skills.split(',').map(s => s.trim()).filter(Boolean);
+      const learningOutcomes = createData.learningOutcomes.split('\n').map(s => s.trim()).filter(Boolean);
+      const prerequisites = createData.prerequisites.split('\n').map(s => s.trim()).filter(Boolean);
+      
+      formData.append('skills', JSON.stringify(skills));
+      formData.append('learningOutcomes', JSON.stringify(learningOutcomes));
+      formData.append('prerequisites', JSON.stringify(prerequisites));
+      
+      // Add thumbnail file if uploaded, otherwise add URL if provided
+      if (thumbnailFile) {
+        formData.append('thumbnail', thumbnailFile);
+      } else if (createData.thumbnail) {
+        formData.append('thumbnail', createData.thumbnail);
+      }
       
       await api.post('/admin/internships', formData, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
+        }
       });
       
       setShowCreateModal(false);
@@ -318,6 +374,8 @@ const AdminInternships = () => {
         learningOutcomes: '',
         prerequisites: ''
       });
+      setThumbnailFile(null);
+      setThumbnailPreview(null);
       fetchCourses();
     } catch (err) {
       console.error('Error creating internship:', err);
@@ -640,13 +698,46 @@ const AdminInternships = () => {
               </div>
 
               <div className="form-group">
-                <label>Thumbnail URL *</label>
+                <label>Thumbnail Image *</label>
+                <div className="image-upload-container">
+                  {thumbnailPreview ? (
+                    <div className="image-preview">
+                      <img src={thumbnailPreview} alt="Thumbnail preview" />
+                      <button 
+                        type="button" 
+                        className="remove-image-btn"
+                        onClick={removeThumbnail}
+                      >
+                        <span className="material-icons">close</span>
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      <label htmlFor="thumbnail-upload" className="file-upload-label">
+                        <span className="material-icons">cloud_upload</span>
+                        <span>Click to upload image</span>
+                        <small>JPG, PNG, GIF or WebP (max 10MB)</small>
+                      </label>
+                      <input
+                        id="thumbnail-upload"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                        style={{ display: 'none' }}
+                      />
+                    </>
+                  )}
+                </div>
+                <small style={{ marginTop: '8px', display: 'block', color: '#666' }}>
+                  Or enter a URL below:
+                </small>
                 <input
                   type="url"
                   value={createData.thumbnail}
                   onChange={(e) => setCreateData({...createData, thumbnail: e.target.value})}
                   placeholder="https://example.com/image.jpg"
-                  required
+                  disabled={!!thumbnailFile}
+                  style={{ marginTop: '5px', opacity: thumbnailFile ? 0.5 : 1 }}
                 />
               </div>
 

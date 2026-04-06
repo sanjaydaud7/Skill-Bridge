@@ -19,7 +19,7 @@ const adminLogSchema = new mongoose.Schema({
         type: String,
         required: true,
         enum: [
-            'Course', 'Module', 'Task', 'FinalProject', 'User',
+            'Internship', 'Module', 'Task', 'FinalProject', 'User',
             'Enrollment', 'TaskSubmission', 'ProjectSubmission',
             'Certificate', 'Payment'
         ]

@@ -49,7 +49,11 @@ const InternshipDetail = () => {
       });
       if (response.data.success) {
         const enrolled = response.data.data.some(
-          enrollment => enrollment.courseId._id === id
+          enrollment => {
+            // Check both _id and courseId references
+            const courseIdValue = enrollment.courseId?._id || enrollment.courseId;
+            return courseIdValue === id || courseIdValue?.toString() === id;
+          }
         );
         setIsEnrolled(enrolled);
         if (enrolled) fetchResources(id);
@@ -164,6 +168,26 @@ const InternshipDetail = () => {
         </button>
 
         <div style={{ background: 'white', padding: '40px', borderRadius: '16px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
+          {/* Thumbnail Image */}
+          {internship.thumbnail && (
+            <div style={{ marginBottom: '30px', borderRadius: '12px', overflow: 'hidden' }}>
+              <img 
+                src={internship.thumbnail} 
+                alt={internship.title}
+                style={{ 
+                  width: '100%', 
+                  height: 'auto', 
+                  maxHeight: '400px', 
+                  objectFit: 'cover',
+                  display: 'block'
+                }}
+                onError={(e) => {
+                  e.target.src = 'https://via.placeholder.com/800x400?text=Internship+Thumbnail';
+                }}
+              />
+            </div>
+          )}
+          
           {/* Header Section */}
           <div style={{ marginBottom: '30px' }}>
             <div style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
@@ -214,9 +238,9 @@ const InternshipDetail = () => {
             </div>
             <div style={{ padding: '20px', background: '#f8fafc', borderRadius: '12px' }}>
               <div style={{ fontSize: '1.5rem', marginBottom: '5px' }}>💰</div>
-              <div style={{ fontSize: '0.875rem', color: '#64748b' }}>Price</div>
+              <div style={{ fontSize: '0.875rem', color: '#64748b' }}>Certificate Price</div>
               <div style={{ fontSize: '1.25rem', fontWeight: '600', color: '#1e293b' }}>
-                ₹{internship.price || 0}
+                ₹{internship.certificatePrice ? (internship.certificatePrice / 100).toFixed(0) : 'Free'}
               </div>
             </div>
             <div style={{ padding: '20px', background: '#f8fafc', borderRadius: '12px' }}>

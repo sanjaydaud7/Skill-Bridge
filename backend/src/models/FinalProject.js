@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const finalProjectSchema = new mongoose.Schema({
     courseId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Course',
+        ref: 'Internship',
         required: true,
         unique: true
     },

@@ -19,6 +19,7 @@ const {
     getCourseStats
 } = require('../../controllers/admin/adminInternshipController');
 const { protect, authorize } = require('../../middleware/auth');
+const { optionalUploadInternshipThumbnail } = require('../../middleware/upload');
 
 // All routes are protected and require admin role
 router.use(protect);
@@ -27,11 +28,11 @@ router.use(authorize('admin'));
 // Course routes
 router.route('/')
     .get(getCourses)
-    .post(createCourse);
+    .post(optionalUploadInternshipThumbnail, createCourse);
 
 router.route('/:id')
     .get(getCourse)
-    .put(updateCourse)
+    .put(optionalUploadInternshipThumbnail, updateCourse)
     .delete(deleteCourse);
 
 router.put('/:id/status', toggleCourseStatus);

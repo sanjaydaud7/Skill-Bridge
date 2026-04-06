@@ -8,7 +8,7 @@ const paymentSchema = new mongoose.Schema({
     },
     courseId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Course',
+        ref: 'Internship',
         required: true
     },
     amount: {

@@ -11,11 +11,13 @@ const { protect } = require('../middleware/auth');
 
 // Public routes
 router.get('/', getAllInternships);
-router.get('/:id', getInternshipById);
 
-// Protected routes
+// Protected routes - MUST be defined before /:id to avoid route conflicts
+router.get('/user/enrolled', protect, getEnrolledInternships);
+
+// Dynamic ID routes - MUST be defined after specific routes
+router.get('/:id', getInternshipById);
 router.get('/:id/curriculum', protect, getInternshipCurriculum);
 router.post('/:id/enroll', protect, enrollInternship);
-router.get('/user/enrolled', protect, getEnrolledInternships);
 
 module.exports = router;

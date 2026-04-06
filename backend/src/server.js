@@ -84,6 +84,13 @@ try { app.use('/api/portfolio', require('./routes/portfolio')); } catch (e) { co
 try { app.use('/api/resume', require('./routes/resume')); } catch (e) { console.warn('[Route] resume failed:', e.message); }
 try { app.use('/api/profile', require('./routes/profile')); } catch (e) { console.warn('[Route] profile failed:', e.message); }
 
+// Enhanced Progress & Gamification Routes
+try { app.use('/api/assessments', require('./routes/assessment')); } catch (e) { console.warn('[Route] assessments failed:', e.message); }
+try { app.use('/api/milestones', require('./routes/milestone')); } catch (e) { console.warn('[Route] milestones failed:', e.message); }
+try { app.use('/api/streaks', require('./routes/streak')); } catch (e) { console.warn('[Route] streaks failed:', e.message); }
+try { app.use('/api/badges', require('./routes/badge')); } catch (e) { console.warn('[Route] badges failed:', e.message); }
+try { app.use('/api/rewards', require('./routes/reward')); } catch (e) { console.warn('[Route] rewards failed:', e.message); }
+
 // 404 handler
 app.use((req, res) => {
     res.status(404).json({

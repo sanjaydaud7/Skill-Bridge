@@ -103,6 +103,34 @@ exports.createCourse = async(req, res) => {
             createdBy: req.user._id
         };
 
+        // If image was uploaded, use Cloudinary URL
+        if (req.file) {
+            courseData.thumbnail = req.file.path;
+        }
+
+        // Parse JSON fields that come from FormData
+        if (typeof courseData.skills === 'string') {
+            try {
+                courseData.skills = JSON.parse(courseData.skills);
+            } catch (e) {
+                courseData.skills = [];
+            }
+        }
+        if (typeof courseData.learningOutcomes === 'string') {
+            try {
+                courseData.learningOutcomes = JSON.parse(courseData.learningOutcomes);
+            } catch (e) {
+                courseData.learningOutcomes = [];
+            }
+        }
+        if (typeof courseData.prerequisites === 'string') {
+            try {
+                courseData.prerequisites = JSON.parse(courseData.prerequisites);
+            } catch (e) {
+                courseData.prerequisites = [];
+            }
+        }
+
         const course = await Internship.create(courseData);
 
         // Log action
@@ -146,6 +174,35 @@ exports.updateCourse = async(req, res) => {
         }
 
         const oldData = course.toObject();
+
+        // If new image was uploaded, use Cloudinary URL
+        if (req.file) {
+            req.body.thumbnail = req.file.path;
+        }
+
+        // Parse JSON fields that come from FormData
+        if (typeof req.body.skills === 'string') {
+            try {
+                req.body.skills = JSON.parse(req.body.skills);
+            } catch (e) {
+                // Keep as is if parsing fails
+            }
+        }
+        if (typeof req.body.learningOutcomes === 'string') {
+            try {
+                req.body.learningOutcomes = JSON.parse(req.body.learningOutcomes);
+            } catch (e) {
+                // Keep as is if parsing fails
+            }
+        }
+        if (typeof req.body.prerequisites === 'string') {
+            try {
+                req.body.prerequisites = JSON.parse(req.body.prerequisites);
+            } catch (e) {
+                // Keep as is if parsing fails
+            }
+        }
+
         Object.assign(course, req.body);
         await course.save();
 
@@ -535,8 +592,7 @@ exports.bulkUpdateModules = async(req, res) => {
 
             // Sanitize: remove incomplete video entries before saving
             const sanitizedVideos = Array.isArray(mod.videos) ?
-                mod.videos.filter(v => v && v.title && v.title.trim() && v.videoUrl && v.videoUrl.trim()) :
-                [];
+                mod.videos.filter(v => v && v.title && v.title.trim() && v.videoUrl && v.videoUrl.trim()) : [];
 
             const moduleData = {
                 ...mod,
