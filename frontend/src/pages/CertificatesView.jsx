@@ -58,6 +58,24 @@ const CertificatesView = () => {
     const paymentSuccess = searchParams.get('success');
     const paymentCanceled = searchParams.get('canceled');
     
+    // If courseId is provided and course is eligible, redirect to CertificateUnlock page
+    if (courseIdFromUrl && enrolledCourses.length > 0) {
+      const targetCourse = enrolledCourses.find(
+        INTERNSHIP => INTERNSHIP.courseId._id === courseIdFromUrl
+      );
+
+      if (targetCourse && targetCourse.progress?.completionPercentage === 100) {
+        // Check if certificate already exists
+        const hasCert = certificates.some(cert => cert.courseId._id === courseIdFromUrl);
+        
+        if (!hasCert) {
+          // Redirect to unlock page instead of showing payment modal
+          navigate(`/dashboard/internship/${courseIdFromUrl}/certificate-unlock`, { replace: true });
+          return;
+        }
+      }
+    }
+    
     // Show success message for Stripe payment
     if (paymentSuccess === 'true') {
       // Wait a bit for webhook to process, then refresh and show success
@@ -112,7 +130,7 @@ const CertificatesView = () => {
         }, 3500);
       }
     }
-  }, [searchParams, enrolledCourses, navigate]);
+  }, [searchParams, enrolledCourses, certificates, navigate]);
 
   const checkEligibility = async (courseId) => {
     try {
@@ -259,6 +277,83 @@ const CertificatesView = () => {
     }
   };
 
+  const handleVerifyClick = (verificationCode, e) => {
+    e.stopPropagation();
+    
+    // Add visual feedback - add the verify-clicked class temporarily
+    const button = e.currentTarget;
+    button.classList.add('verify-clicked');
+    
+    // Show a notification
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 16px 24px;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+      z-index: 10000;
+      font-weight: 600;
+      animation: slideInRight 0.4s ease-out, slideOutRight 0.4s ease-out 3.6s forwards;
+      max-width: 300px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    `;
+    
+    notification.innerHTML = `
+      <span style="font-size: 18px;">🔍</span>
+      <span>Loading certificate verification page...</span>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Add CSS animations if not already present
+    if (!document.querySelector('style[data-verify-animations]')) {
+      const style = document.createElement('style');
+      style.setAttribute('data-verify-animations', 'true');
+      style.textContent = `
+        @keyframes slideInRight {
+          from {
+            transform: translateX(400px);
+            opacity: 0;
+          }
+          to {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+        @keyframes slideOutRight {
+          from {
+            transform: translateX(0);
+            opacity: 1;
+          }
+          to {
+            transform: translateX(400px);
+            opacity: 0;
+          }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+    
+    // Remove notification after animation
+    setTimeout(() => {
+      notification.remove();
+    }, 4000);
+    
+    // Remove the verify-clicked class after animation
+    setTimeout(() => {
+      button.classList.remove('verify-clicked');
+    }, 300);
+    
+    // Navigate to verification page in same tab
+    navigate(`/verify/${verificationCode}`);
+  };
+
   // Helper for beautiful certificate card
   const renderCertificateCard = cert => (
     <div
@@ -290,10 +385,11 @@ const CertificatesView = () => {
           📥 Download PDF
         </button>
         <button 
-          onClick={e => { e.stopPropagation(); window.open(`${API_URL}/certificates/verify/${cert.verificationCode}`, '_blank'); }}
+          onClick={(e) => handleVerifyClick(cert.verificationCode, e)}
           className="btn btn-outline"
+          title="Verify this certificate with employers"
         >
-          🔍 Verify
+          🔍 Verify Certificate
         </button>
       </div>
     </div>

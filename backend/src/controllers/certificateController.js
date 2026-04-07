@@ -633,3 +633,91 @@ exports.downloadCertificate = async(req, res) => {
         }
     }
 };
+
+// @desc    Unlock certificate - Create a pending certificate for payment (TESTING ONLY)
+// @route   POST /api/certificates/:courseId/unlock
+// @access  Private
+exports.unlockCertificate = async(req, res) => {
+    try {
+        // Check if in development mode
+        if (process.env.NODE_ENV === 'production') {
+            return res.status(403).json({
+                success: false,
+                message: 'This action is not allowed in production'
+            });
+        }
+
+        const { courseId } = req.params;
+        const userId = req.user.id;
+
+        // Get enrollment and course
+        const enrollment = await Enrollment.findOne({ userId, courseId });
+        const course = await Internship.findById(courseId);
+
+        if (!enrollment || !course) {
+            return res.status(404).json({
+                success: false,
+                message: 'Enrollment or course not found'
+            });
+        }
+
+        // Check requirements
+        const completionPercentage = enrollment.progress.completionPercentage;
+        const videosCompleted = completionPercentage === 100;
+        const totalTasks = await Task.countDocuments({ courseId });
+        const completedTasksCount = enrollment.progress.tasksCompleted.length;
+        const tasksApproved = completedTasksCount >= totalTasks || completionPercentage === 100;
+        const projectApproved = enrollment.progress.projectApproved === true;
+        const eligible = videosCompleted && tasksApproved && projectApproved;
+
+        if (!eligible) {
+            return res.status(400).json({
+                success: false,
+                message: 'Complete all requirements to unlock certificate'
+            });
+        }
+
+        // Check if certificate already exists
+        const existingCertificate = await Certificate.findOne({ userId, courseId });
+        if (existingCertificate && existingCertificate.status === 'issued') {
+            return res.status(400).json({
+                success: false,
+                message: 'Certificate already issued'
+            });
+        }
+
+        // If certificate exists but is pending payment, return it
+        if (existingCertificate && existingCertificate.status === 'pending-payment') {
+            return res.status(200).json({
+                success: true,
+                message: 'Certificate unlock pending - awaiting payment',
+                data: existingCertificate
+            });
+        }
+
+        // Create new pending certificate
+        const certificate = new Certificate({
+            userId,
+            courseId,
+            enrollmentId: enrollment._id,
+            status: 'pending-payment',
+            grade: 'A',
+            skills: course.skills || []
+        });
+
+        await certificate.save();
+
+        res.status(200).json({
+            success: true,
+            message: 'Certificate unlock initiated - proceed with payment',
+            data: certificate
+        });
+    } catch (error) {
+        console.error('Unlock certificate error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Server error while unlocking certificate',
+            error: error.message
+        });
+    }
+};

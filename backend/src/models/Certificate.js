@@ -29,6 +29,11 @@ const certificateSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Payment'
     },
+    status: {
+        type: String,
+        enum: ['pending-payment', 'issued'],
+        default: 'issued'
+    },
     pdfUrl: {
         type: String
     },

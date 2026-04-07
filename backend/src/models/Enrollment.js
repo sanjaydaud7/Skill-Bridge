@@ -56,6 +56,28 @@ const enrollmentSchema = new mongoose.Schema({
             max: 100
         }
     },
+    // Bypass tracking flags
+    bypassCurriculum: {
+        type: Boolean,
+        default: false
+    },
+    bypassedCurriculumAt: {
+        type: Date
+    },
+    bypassTasks: {
+        type: Boolean,
+        default: false
+    },
+    bypassedTasksAt: {
+        type: Date
+    },
+    bypassProject: {
+        type: Boolean,
+        default: false
+    },
+    bypassedProjectAt: {
+        type: Date
+    },
     lastAccessedAt: {
         type: Date,
         default: Date.now

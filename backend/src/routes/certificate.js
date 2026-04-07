@@ -5,7 +5,8 @@ const {
     generateCertificate,
     getUserCertificates,
     verifyCertificate,
-    downloadCertificate
+    downloadCertificate,
+    unlockCertificate
 } = require('../controllers/certificateController');
 const { protect } = require('../middleware/auth');
 
@@ -17,6 +18,7 @@ router.use(protect);
 
 router.get('/', getUserCertificates);
 router.get('/:courseId/eligibility', checkEligibility);
+router.post('/:courseId/unlock', unlockCertificate);
 router.post('/:courseId/generate', generateCertificate);
 router.get('/:id/download', downloadCertificate);
 

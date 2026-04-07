@@ -13,6 +13,8 @@ import InternshipDetail from './pages/InternshipDetail';
 import InternshipView from './pages/InternshipView';
 import TasksView from './pages/TasksView';
 import CertificatesView from './pages/CertificatesView';
+import CertificateUnlock from './pages/CertificateUnlock';
+import VerifyCertificate from './pages/VerifyCertificate';
 import AdminRoute from './components/admin/AdminRoute';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminInternships from './pages/admin/AdminInternships';
@@ -61,6 +63,8 @@ function App() {
         <Route path="/dashboard/internship/:courseId" element={<InternshipView />} />
         <Route path="/dashboard/internship/:courseId/tasks" element={<TasksView />} />
         <Route path="/dashboard/certificates" element={<CertificatesView />} />
+        <Route path="/dashboard/internship/:courseId/certificate-unlock" element={<CertificateUnlock />} />
+        <Route path="/verify/:code" element={<VerifyCertificate />} />
         
         {/* Admin Routes */}
         <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />

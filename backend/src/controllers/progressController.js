@@ -286,3 +286,206 @@ exports.bypassCompleteAll = async(req, res) => {
         });
     }
 };
+
+// @desc    Bypass curriculum - Mark all videos/modules as completed (TESTING ONLY)
+// @route   POST /api/progress/:courseId/bypass-curriculum
+// @access  Private
+exports.bypassCurriculum = async(req, res) => {
+    try {
+        // Check if in development mode
+        if (process.env.NODE_ENV === 'production') {
+            return res.status(403).json({
+                success: false,
+                message: 'This action is not allowed in production'
+            });
+        }
+
+        const { courseId } = req.params;
+        const userId = req.user.id;
+
+        const enrollment = await Enrollment.findOne({ userId, courseId });
+
+        if (!enrollment) {
+            return res.status(404).json({
+                success: false,
+                message: 'Enrollment not found'
+            });
+        }
+
+        // Get all modules
+        const modules = await Module.find({ courseId });
+
+        let videosCompleted = 0;
+
+        // Mark all videos as completed
+        for (const module of modules) {
+            const alreadyCompleted = enrollment.progress.videosCompleted.some(
+                v => v.moduleId.toString() === module._id.toString()
+            );
+
+            if (!alreadyCompleted) {
+                enrollment.progress.videosCompleted.push({
+                    moduleId: module._id,
+                    completedAt: new Date()
+                });
+                videosCompleted++;
+            }
+        }
+
+        // Update bypass flag
+        enrollment.bypassCurriculum = true;
+        enrollment.bypassedCurriculumAt = new Date();
+
+        // Update status if needed
+        if (enrollment.status === 'enrolled') {
+            enrollment.status = 'in-progress';
+        }
+
+        enrollment.lastAccessedAt = new Date();
+        await enrollment.save();
+
+        res.status(200).json({
+            success: true,
+            message: 'Curriculum bypassed - all modules marked as completed',
+            data: {
+                videosCompleted,
+                bypassCurriculum: true,
+                enrollment
+            }
+        });
+    } catch (error) {
+        console.error('Bypass curriculum error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Server error while bypassing curriculum',
+            error: error.message
+        });
+    }
+};
+
+// @desc    Bypass tasks - Mark all tasks as completed (TESTING ONLY)
+// @route   POST /api/progress/:courseId/bypass-tasks
+// @access  Private
+exports.bypassTasks = async(req, res) => {
+    try {
+        // Check if in development mode
+        if (process.env.NODE_ENV === 'production') {
+            return res.status(403).json({
+                success: false,
+                message: 'This action is not allowed in production'
+            });
+        }
+
+        const { courseId } = req.params;
+        const userId = req.user.id;
+
+        const enrollment = await Enrollment.findOne({ userId, courseId });
+
+        if (!enrollment) {
+            return res.status(404).json({
+                success: false,
+                message: 'Enrollment not found'
+            });
+        }
+
+        // Get all tasks
+        const Task = require('../models/Task');
+        const tasks = await Task.find({ courseId });
+
+        let tasksCompleted = 0;
+
+        // Mark all tasks as completed
+        for (const task of tasks) {
+            const alreadyCompleted = enrollment.progress.tasksCompleted.some(
+                t => t.taskId.toString() === task._id.toString()
+            );
+
+            if (!alreadyCompleted) {
+                enrollment.progress.tasksCompleted.push({
+                    taskId: task._id,
+                    completedAt: new Date()
+                });
+                tasksCompleted++;
+            }
+        }
+
+        // Update bypass flag
+        enrollment.bypassTasks = true;
+        enrollment.bypassedTasksAt = new Date();
+
+        enrollment.lastAccessedAt = new Date();
+        await enrollment.save();
+
+        res.status(200).json({
+            success: true,
+            message: 'Tasks bypassed - all tasks marked as completed',
+            data: {
+                tasksCompleted,
+                bypassTasks: true,
+                enrollment
+            }
+        });
+    } catch (error) {
+        console.error('Bypass tasks error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Server error while bypassing tasks',
+            error: error.message
+        });
+    }
+};
+
+// @desc    Bypass project - Mark project as approved (TESTING ONLY)
+// @route   POST /api/progress/:courseId/bypass-project
+// @access  Private
+exports.bypassProject = async(req, res) => {
+    try {
+        // Check if in development mode
+        if (process.env.NODE_ENV === 'production') {
+            return res.status(403).json({
+                success: false,
+                message: 'This action is not allowed in production'
+            });
+        }
+
+        const { courseId } = req.params;
+        const userId = req.user.id;
+
+        const enrollment = await Enrollment.findOne({ userId, courseId });
+
+        if (!enrollment) {
+            return res.status(404).json({
+                success: false,
+                message: 'Enrollment not found'
+            });
+        }
+
+        // Mark project as submitted and approved
+        enrollment.progress.projectSubmitted = true;
+        enrollment.progress.projectApproved = true;
+
+        // Update bypass flag
+        enrollment.bypassProject = true;
+        enrollment.bypassedProjectAt = new Date();
+
+        enrollment.lastAccessedAt = new Date();
+        await enrollment.save();
+
+        res.status(200).json({
+            success: true,
+            message: 'Project bypassed - project marked as approved',
+            data: {
+                projectApproved: true,
+                bypassProject: true,
+                enrollment
+            }
+        });
+    } catch (error) {
+        console.error('Bypass project error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Server error while bypassing project',
+            error: error.message
+        });
+    }
+};

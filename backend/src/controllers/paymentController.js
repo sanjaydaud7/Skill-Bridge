@@ -212,28 +212,64 @@ exports.handleWebhook = async(req, res) => {
             } else {
                 console.log('✅ Payment updated:', payment._id);
 
-                // Auto-generate certificate
-                const enrollment = await Enrollment.findOne({
-                    userId: payment.userId,
-                    courseId: payment.courseId
-                });
+                // Check if this is a certificate unlock payment
+                const isCertificateUnlock = session.metadata?.paymentType === 'certificate-unlock';
 
-                if (enrollment) {
-                    console.log('🎓 Generating certificate for completed payment');
-                    const certificate = await autoGenerateCertificate(
-                        payment.userId,
-                        payment.courseId,
-                        payment._id,
-                        enrollment._id
-                    );
+                if (isCertificateUnlock && session.metadata?.certificateId) {
+                    // Handle certificate unlock payment
+                    console.log('🔓 Processing certificate unlock payment');
+                    
+                    try {
+                        // Find and update the pending certificate
+                        const certificate = await Certificate.findByIdAndUpdate(
+                            session.metadata.certificateId,
+                            {
+                                status: 'issued',
+                                paymentId: payment._id,
+                                pdfUrl: `https://certificates.skillbridge.com/${session.metadata.certificateId}.pdf`
+                            },
+                            { new: true }
+                        );
 
-                    if (certificate) {
-                        console.log('🎉 Certificate unlocked:', certificate._id);
-                    } else {
-                        console.error('❌ Failed to generate certificate');
+                        if (certificate) {
+                            // Update enrollment
+                            await Enrollment.findByIdAndUpdate(certificate.enrollmentId, {
+                                status: 'certificate-purchased',
+                                certificateId: certificate._id,
+                                completedAt: new Date()
+                            });
+
+                            console.log('🎉 Certificate unlocked through payment:', certificate._id);
+                        } else {
+                            console.error('❌ Certificate not found for unlock');
+                        }
+                    } catch (certErr) {
+                        console.error('❌ Error unlocking certificate:', certErr.message);
                     }
                 } else {
-                    console.error('❌ Enrollment not found for payment:', payment._id);
+                    // Handle regular certificate generation (legacy flow)
+                    const enrollment = await Enrollment.findOne({
+                        userId: payment.userId,
+                        courseId: payment.courseId
+                    });
+
+                    if (enrollment) {
+                        console.log('🎓 Generating certificate for completed payment');
+                        const certificate = await autoGenerateCertificate(
+                            payment.userId,
+                            payment.courseId,
+                            payment._id,
+                            enrollment._id
+                        );
+
+                        if (certificate) {
+                            console.log('🎉 Certificate generated:', certificate._id);
+                        } else {
+                            console.error('❌ Failed to generate certificate');
+                        }
+                    } else {
+                        console.error('❌ Enrollment not found for payment:', payment._id);
+                    }
                 }
             }
 
@@ -372,6 +408,147 @@ exports.bypassPayment = async(req, res) => {
         res.status(500).json({
             success: false,
             message: 'Server error while bypassing payment'
+        });
+    }
+};
+
+// @desc    Unlock certificate through payment
+// @route   POST /api/payments/:courseId/unlock-certificate
+// @access  Private
+exports.unlockCertificatePayment = async(req, res) => {
+    try {
+        const { courseId } = req.params;
+        const { paymentMethod } = req.body;
+        const userId = req.user.id;
+
+        // Get course and enrollment
+        const course = await Internship.findById(courseId);
+        const enrollment = await Enrollment.findOne({ userId, courseId });
+
+        if (!course || !enrollment) {
+            return res.status(404).json({
+                success: false,
+                message: 'Course or enrollment not found'
+            });
+        }
+
+        // Check for existing pending certificate
+        const pendingCertificate = await Certificate.findOne({
+            userId,
+            courseId,
+            status: 'pending-payment'
+        });
+
+        if (!pendingCertificate) {
+            return res.status(404).json({
+                success: false,
+                message: 'No pending certificate found'
+            });
+        }
+
+        // Handle payment method
+        if (paymentMethod === 'bypass') {
+            // Only allow in development mode
+            if (process.env.NODE_ENV === 'production') {
+                return res.status(403).json({
+                    success: false,
+                    message: 'Bypass payment only available in development mode'
+                });
+            }
+
+            // Create bypassed payment record
+            const payment = await Payment.create({
+                userId,
+                courseId,
+                amount: course.certificatePrice || 499,
+                currency: 'inr',
+                status: 'completed',
+                bypassedForTesting: true,
+                paidAt: new Date(),
+                paymentMethod: 'bypass'
+            });
+
+            // Update certificate to issued
+            pendingCertificate.status = 'issued';
+            pendingCertificate.paymentId = payment._id;
+            const issuedCertificate = await pendingCertificate.save();
+
+            // Update enrollment
+            enrollment.status = 'certificate-purchased';
+            enrollment.certificateId = issuedCertificate._id;
+            enrollment.completedAt = new Date();
+            await enrollment.save();
+
+            // Set placeholder PDF URL
+            issuedCertificate.pdfUrl = `https://certificates.skillbridge.com/${issuedCertificate.certificateNumber}.pdf`;
+            await issuedCertificate.save();
+
+            return res.status(200).json({
+                success: true,
+                message: 'Certificate unlocked successfully (bypass mode)',
+                data: {
+                    payment,
+                    certificate: issuedCertificate
+                }
+            });
+        } else if (paymentMethod === 'stripe') {
+            // Create checkout session for certificate unlock
+            const session = await stripe.checkout.sessions.create({
+                customer_email: req.user?.email,
+                payment_method_types: ['card'],
+                line_items: [{
+                    price_data: {
+                        currency: 'inr',
+                        product_data: {
+                            name: `${course.title} - Certificate Unlock`,
+                            description: 'Unlock and download your certificate of completion'
+                        },
+                        unit_amount: (course.certificatePrice || 499) * 100
+                    },
+                    quantity: 1
+                }],
+                mode: 'payment',
+                success_url: `${process.env.CLIENT_URL}/internship/${courseId}/certificate?status=success`,
+                cancel_url: `${process.env.CLIENT_URL}/internship/${courseId}/certificate-unlock?status=cancelled`,
+                metadata: {
+                    userId,
+                    courseId,
+                    certificateId: pendingCertificate._id.toString(),
+                    paymentType: 'certificate-unlock'
+                }
+            });
+
+            // Create payment record (pending)
+            const payment = await Payment.create({
+                userId,
+                courseId,
+                amount: course.certificatePrice || 499,
+                currency: 'inr',
+                status: 'pending',
+                stripeSessionId: session.id,
+                paymentMethod: 'stripe'
+            });
+
+            res.status(200).json({
+                success: true,
+                message: 'Checkout session created',
+                data: {
+                    sessionId: session.id,
+                    paymentId: payment._id
+                }
+            });
+        } else {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid payment method'
+            });
+        }
+    } catch (error) {
+        console.error('Unlock certificate payment error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Server error while processing certificate unlock payment',
+            error: error.message
         });
     }
 };

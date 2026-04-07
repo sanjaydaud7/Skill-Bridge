@@ -815,6 +815,154 @@
 }
 
 
+/* ============================================
+   VERIFY CERTIFICATE BUTTON
+   ============================================ */
+
+.btn.btn-outline:has(+ .btn) {
+    /* If there's another button after it */
+}
+
+/* Specific styling for verify button in certificates */
+.certificate-actions .btn-outline {
+    background: transparent;
+    color: #667eea;
+    border: 2px solid #667eea;
+    font-weight: 600;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Hover state */
+.certificate-actions .btn-outline:hover {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    color: white !important;
+    border-color: #667eea;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+}
+
+/* Active/Clicked state */
+.certificate-actions .btn-outline:active {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+/* Click animation - ripple effect */
+.certificate-actions .btn-outline::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.6);
+    transform: translate(-50%, -50%);
+    animation: none;
+    transition: none;
+}
+
+.certificate-actions .btn-outline:active::before {
+    width: 300px;
+    height: 300px;
+    animation: ripple 0.6s ease-out;
+}
+
+@keyframes ripple {
+    0% {
+        width: 0;
+        height: 0;
+        opacity: 0.8;
+    }
+    100% {
+        width: 300px;
+        height: 300px;
+        opacity: 0;
+    }
+}
+
+/* Verify button icon enhancement */
+.certificate-actions .btn-outline::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s ease;
+}
+
+.certificate-actions .btn-outline:hover::after {
+    left: 100%;
+}
+
+/* Verify button focus state (for accessibility) */
+.certificate-actions .btn-outline:focus {
+    outline: 2px solid #667eea;
+    outline-offset: 2px;
+}
+
+/* Verify button visited state (after opening) */
+.certificate-actions .btn-outline:visited {
+    opacity: 0.9;
+}
+
+/* Scale animation on click */
+.certificate-actions .btn-outline {
+    animation: none;
+}
+
+.certificate-actions .btn-outline:active {
+    animation: buttonPress 0.3s ease;
+}
+
+@keyframes buttonPress {
+    0% {
+        transform: translateY(-3px) scale(1);
+    }
+    50% {
+        transform: translateY(-1px) scale(1.05);
+    }
+    100% {
+        transform: translateY(-1px) scale(1);
+    }
+}
+
+/* State indicator - subtle pulse when hover */
+.certificate-actions {
+    position: relative;
+}
+
+.certificate-actions .btn-outline {
+    position: relative;
+}
+
+.certificate-actions .btn-outline.verify-clicked {
+    background: #f0f4ff !important;
+    color: #667eea !important;
+    border-color: #667eea !important;
+}
+
+/* Tooltip style for verify button */
+.certificate-actions .btn-outline[title]:hover::tooltip {
+    display: block;
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #333;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    margin-bottom: 8px;
+    z-index: 1000;
+}
+
 /* Responsive Design */
 
 @media (max-width: 1200px) {

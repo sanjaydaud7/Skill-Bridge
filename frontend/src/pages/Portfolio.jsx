@@ -177,14 +177,13 @@ const Portfolio = () => {
                                             <span>{new Date(cert.issuedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short' })}</span>
                                         </div>
                                         <p className="pf-cert-number">#{cert.certificateNumber}</p>
-                                        <a
-                                            href={`/verify/${cert.verificationCode}`}
+                                        <button
+                                            onClick={() => navigate(`/verify/${cert.verificationCode}`)}
                                             className="pf-verify-link"
-                                            target="_blank"
-                                            rel="noopener noreferrer"
+                                            title="Verify this certificate"
                                         >
                                             🔍 Verify
-                                        </a>
+                                        </button>
                                     </div>
                                 </div>
                             ))}

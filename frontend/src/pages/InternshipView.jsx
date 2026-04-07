@@ -3,9 +3,9 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import ConfirmModal from '../components/ConfirmModal';
 import axios from 'axios';
 import '../styles/InternshipView.css';
-import { saveAs } from 'file-saver';
 
 const API_URL = 'http://localhost:5000/api';
 
@@ -26,6 +26,23 @@ const InternshipView = () => {
   const videoRef = useRef(null);
   const [certificate, setCertificate] = useState(null);
   const [loadingCertificate, setLoadingCertificate] = useState(false);
+  
+  // Bypass tracking state
+  const [bypassCurriculumClicked, setBypassCurriculumClicked] = useState(false);
+  const [bypassTasksClicked, setBypassTasksClicked] = useState(false);
+  const [bypassProjectClicked, setBypassProjectClicked] = useState(false);
+  
+  // Modal state
+  const [modalState, setModalState] = useState({
+    isOpen: false,
+    type: 'warning',
+    title: '',
+    message: '',
+    confirmText: 'Confirm',
+    cancelText: 'Cancel',
+    onConfirm: null,
+    context: null // 'curriculum', 'tasks', 'project'
+  });
 
   // Fetch certificate if eligible
   useEffect(() => {
@@ -56,48 +73,6 @@ const InternshipView = () => {
     };
     fetchCertificate();
   }, [progress, courseId, token]);
-
-  // Download certificate PDF
-  const handleDownloadCertificate = async () => {
-    if (!certificate) return;
-    try {
-      const res = await axios.get(`${API_URL}/certificates/${certificate._id}/download`, {
-        responseType: 'blob',
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      saveAs(res.data, `Certificate-${certificate.certificateNumber || certificate._id}.pdf`);
-    } catch (err) {
-      alert('Failed to download certificate.');
-    }
-  };
-
-  // Certificate generation handler
-  const handleGenerateCertificate = async () => {
-    setLoadingCertificate(true);
-    try {
-      // Use 'BYPASS' for paymentId if payment is bypassed
-      const paymentId = progress?.enrollment?.paymentId || 'BYPASS';
-      const res = await axios.post(
-        `${API_URL}/certificates/${courseId}/generate`,
-        { paymentId },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      if (res.data && res.data.success) {
-        setCertificate(res.data.data);
-        alert('Certificate generated successfully!');
-      } else {
-        alert(res.data.message || 'Failed to generate certificate.');
-      }
-    } catch (error) {
-      alert(
-        error.response?.data?.message ||
-        error.response?.data?.error ||
-        'Failed to generate certificate.'
-      );
-      setCertificate(null);
-    }
-    setLoadingCertificate(false);
-  };
 
   useEffect(() => {
     if (!isAuthenticated()) {
@@ -179,12 +154,164 @@ const InternshipView = () => {
     }
   };
 
-  // Bypass function to complete all videos, tasks, and project for testing
-  const handleBypassCompletion = async () => {
-    if (!window.confirm('⚠️ TESTING MODE: This will mark ALL videos, tasks, and project as complete. Continue?')) {
-      return;
-    }
+  // Modal management functions
+  const openModal = (context, title, message, confirmHandler) => {
+    setModalState({
+      isOpen: true,
+      type: 'warning',
+      title,
+      message,
+      confirmText: 'Yes, Continue',
+      cancelText: 'Cancel',
+      onConfirm: confirmHandler,
+      context
+    });
+  };
 
+  const closeModal = () => {
+    setModalState({
+      ...modalState,
+      isOpen: false
+    });
+  };
+
+  // Bypass curriculum - Mark all videos/modules as completed
+  const handleBypassCurriculum = async () => {
+    openModal(
+      'curriculum',
+      'TESTING MODE',
+      '⚠️ This will mark ALL videos/modules as completed. Are you sure you want to continue?',
+      executeCurriculumBypass
+    );
+  };
+
+  const executeCurriculumBypass = async () => {
+    closeModal();
+    
+    try {
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+
+      console.log('Calling bypass-curriculum endpoint for courseId:', courseId);
+
+      const response = await axios.post(
+        `${API_URL}/progress/${courseId}/bypass-curriculum`,
+        {},
+        config
+      );
+
+      console.log('Bypass curriculum response:', response.data);
+
+      // Refresh progress
+      const progressRes = await axios.get(`${API_URL}/progress/${courseId}`, config);
+      setProgress(progressRes.data.data);
+
+      setBypassCurriculumClicked(true);
+
+      alert(`✅ Curriculum Bypassed!\n\n📹 All videos marked as completed`);
+    } catch (error) {
+      console.error('Error in bypass curriculum:', error);
+      const errorMsg = error.response?.data?.message || error.message || 'Unknown error';
+      alert(`❌ Error during bypass: ${errorMsg}`);
+    }
+  };
+
+  // Bypass tasks - Mark all tasks as completed  
+  const handleBypassTasks = async () => {
+    openModal(
+      'tasks',
+      'TESTING MODE',
+      '⚠️ This will mark ALL tasks as completed. Are you sure you want to continue?',
+      executeTasksBypass
+    );
+  };
+
+  const executeTasksBypass = async () => {
+    closeModal();
+    
+    try {
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+
+      console.log('Calling bypass-tasks endpoint for courseId:', courseId);
+
+      const response = await axios.post(
+        `${API_URL}/progress/${courseId}/bypass-tasks`,
+        {},
+        config
+      );
+
+      console.log('Bypass tasks response:', response.data);
+
+      // Refresh progress
+      const progressRes = await axios.get(`${API_URL}/progress/${courseId}`, config);
+      setProgress(progressRes.data.data);
+
+      // Refresh tasks
+      const tasksRes = await axios.get(`${API_URL}/tasks/${courseId}`, config);
+      setTasks(tasksRes.data.data);
+
+      setBypassTasksClicked(true);
+
+      alert(`✅ Tasks Bypassed!\n\n📝 ${response.data.data.tasksCompleted} tasks marked as completed`);
+    } catch (error) {
+      console.error('Error in bypass tasks:', error);
+      const errorMsg = error.response?.data?.message || error.message || 'Unknown error';
+      alert(`❌ Error during bypass: ${errorMsg}`);
+    }
+  };
+
+  // Bypass project - Mark project as approved
+  const handleBypassProject = async () => {
+    openModal(
+      'project',
+      'TESTING MODE',
+      '⚠️ This will mark the final project as approved. Are you sure you want to continue?',
+      executeProjectBypass
+    );
+  };
+
+  const executeProjectBypass = async () => {
+    closeModal();
+    
+    try {
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+
+      console.log('Calling bypass-project endpoint for courseId:', courseId);
+
+      const response = await axios.post(
+        `${API_URL}/progress/${courseId}/bypass-project`,
+        {},
+        config
+      );
+
+      console.log('Bypass project response:', response.data);
+
+      // Refresh progress
+      const progressRes = await axios.get(`${API_URL}/progress/${courseId}`, config);
+      setProgress(progressRes.data.data);
+
+      setBypassProjectClicked(true);
+
+      alert(`✅ Project Bypassed!\n\n🎯 Final project marked as approved\n\n🏆 Certificate is now available!`);
+    } catch (error) {
+      console.error('Error in bypass project:', error);
+      const errorMsg = error.response?.data?.message || error.message || 'Unknown error';
+      alert(`❌ Error during bypass: ${errorMsg}`);
+    }
+  };
+
+  // Bypass function to complete all videos, tasks, and project for testing (legacy support)
+  const handleBypassCompletion = async () => {
+    openModal(
+      'all',
+      'TESTING MODE',
+      '⚠️ This will mark ALL videos, tasks, and the project as complete. Are you sure you want to continue?',
+      executeCompleteBypass
+    );
+  };
+
+  const executeCompleteBypass = async () => {
+    closeModal();
+    
     try {
       const config = { headers: { Authorization: `Bearer ${token}` } };
 
@@ -384,12 +511,35 @@ const InternshipView = () => {
                 <p className="progress-text">
                   {progress?.stats?.completionPercentage || 0}% Complete
                 </p>
+              </div>
+              
+              {/* Separate Bypass Buttons */}
+              <div className="bypass-buttons-group">
                 <button 
-                  onClick={handleBypassCompletion}
-                  className="bypass-btn"
-                  title="Testing: Mark all videos, tasks, and project as complete"
+                  onClick={handleBypassCurriculum}
+                  className={`bypass-btn bypass-btn-curriculum ${bypassCurriculumClicked ? 'completed' : ''}`}
+                  title="Testing: Mark all videos/modules as completed"
+                  disabled={false}
                 >
-                  ⚡ Complete All (Test)
+                  {bypassCurriculumClicked ? '✓ Curriculum Done' : '1️⃣ Bypass Curriculum'}
+                </button>
+                
+                <button 
+                  onClick={handleBypassTasks}
+                  className={`bypass-btn bypass-btn-tasks ${bypassTasksClicked ? 'completed' : ''}`}
+                  title="Testing: Mark all tasks as completed"
+                  disabled={!bypassCurriculumClicked}
+                >
+                  {bypassTasksClicked ? '✓ Tasks Done' : '2️⃣ Bypass Tasks'}
+                </button>
+                
+                <button 
+                  onClick={handleBypassProject}
+                  className={`bypass-btn bypass-btn-project ${bypassProjectClicked ? 'completed' : ''}`}
+                  title="Testing: Mark final project as approved"
+                  disabled={!bypassTasksClicked}
+                >
+                  {bypassProjectClicked ? '✓ Project Done' : '3️⃣ Bypass Project'}
                 </button>
               </div>
             </div>
@@ -618,33 +768,15 @@ const InternshipView = () => {
                   <p className="ready-message">
                     Congratulations! You've completed all requirements.
                   </p>
-                  {loadingCertificate ? (
-                    <p>Loading certificate...</p>
-                  ) : certificate ? (
-                    <>
-                      <button
-                        onClick={handleDownloadCertificate}
-                        className="btn btn-primary btn-full"
-                      >
-                        📄 Download Certificate PDF
-                      </button>
-                      <p className="certificate-note">
-                        Certificate unlocked! You can download it as PDF.
-                      </p>
-                    </>
-                  ) : (
-                      <>
-                        <button
-                          onClick={() => navigate(`/dashboard/certificates?courseId=${courseId}`)}
-                          className="btn btn-success btn-full"
-                        >
-                          🎓 Get Certificate
-                        </button>
-                        <p className="certificate-note">
-                          (Use bypass payment option for testing)
-                        </p>
-                      </>
-                  )}
+                  <button
+                    onClick={() => navigate(`/dashboard/internship/${courseId}/certificate-unlock`)}
+                    className="btn btn-success btn-full"
+                  >
+                    🔓 Unlock Certificate
+                  </button>
+                  <p className="certificate-note">
+                    Complete payment to unlock and download your certificate
+                  </p>
                 </div>
             ) : (
               <div className="certificate-locked">
@@ -666,6 +798,18 @@ const InternshipView = () => {
         </div>
       </div>
       <Footer />
+      
+      {/* Confirmation Modal */}
+      <ConfirmModal
+        isOpen={modalState.isOpen}
+        type={modalState.type}
+        title={modalState.title}
+        message={modalState.message}
+        confirmText={modalState.confirmText}
+        cancelText={modalState.cancelText}
+        onConfirm={modalState.onConfirm}
+        onCancel={closeModal}
+      />
     </div>
   );
 };

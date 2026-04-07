@@ -151,6 +151,62 @@
     box-shadow: 0 4px 14px rgba(255, 107, 107, 0.45);
 }
 
+/* Bypass buttons group styling */
+.bypass-buttons-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 16px;
+    padding: 12px;
+    background: #f8f9ff;
+    border-radius: 10px;
+    border: 1px dashed #cbd5e1;
+}
+
+.bypass-btn-curriculum,
+.bypass-btn-tasks,
+.bypass-btn-project {
+    flex: 1;
+    min-width: 140px;
+    padding: 10px 12px;
+    font-size: 13px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.bypass-btn-curriculum {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.bypass-btn-tasks {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.bypass-btn-project {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.bypass-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.bypass-btn:disabled:hover {
+    box-shadow: none;
+    transform: none;
+}
+
+.bypass-btn.completed {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+.bypass-btn.completed:hover {
+    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.45);
+}
+
+
 
 /* â”€â”€ Quick Stats bar â”€â”€ */
 
